@@ -14,6 +14,8 @@ It is always listening for data from multiple clients. By the default, when the 
 
 To send arbitrary data to particular client use
 ``
-SendAsync[]
+SendAsync[message, socket, Promise-> Handler]
 ``
-  
+The argument `message` has the attribute `Hold`.
+`socket` is the of the connection with the particular client, basically it's `SocketObject[""]//First`.
+With the option `Promise` you can specify which function (`Handler`) will be used on upcoming reply from the client. 
