@@ -82,20 +82,21 @@ $listen = SocketListen[$server, Function[x,
                         streams[#]["residue"] = Drop[data, streams[#]["length"]];
                         streams[#]["length"] = 0;    
 
-                        result = result//BinaryDeserialize//ReleaseHold;                    
-                        Print[result//ToString];
-                        Reply[#, result];
+                        result = result//BinaryDeserialize;   
+                        streams[#]["promise"][result, #];  
+                        (*back to default*)
+                        streams[#]["promise"] = EvalAndReply;               
                     ,
                         (*return back to the residue*)
                         Print["not enough bytes..."];
                         streams[#]["residue"] = data;                        
                     ];
-                    
-                ,
-                    Print["not enough bytes to extract length..."];
-                    (*return back to the residue*)
-                    streams[#]["residue"] = data;
-                ];
+
+                    ,
+                        Print["not enough bytes to extract length..."];
+                        (*return back to the residue*)
+                        streams[#]["residue"] = data;
+                    ];
 
 
 
@@ -155,7 +156,8 @@ EvalAndReply[message_, src_]:=
         With[{data = message//ReleaseHold},
             Print[data//ToString];
             SendAsync[data, src];
-        ];
+            data
+        ]
     ];
 
 
@@ -164,7 +166,8 @@ Eval[message_, src_]:=
     Block[{socket = src}, 
         With[{data = message//ReleaseHold},
             Print[data//ToString];
-        ];
+            data
+        ]
     ];
 
 SendAsync[message_, src_, OptionsPattern[]]:=With[{socket = SocketObject[src], data = message//Hold//BinarySerialize},
