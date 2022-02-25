@@ -1,5 +1,5 @@
 $port=256;
-$ip="83.220.175.48";
+$ip="127.0.0.1";
 
 Print["starting zmq-like client..."];
 
