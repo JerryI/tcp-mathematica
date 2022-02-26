@@ -1,15 +1,19 @@
-$port=256;
-$ip="127.0.0.1";
+If[!FileExistsQ["default_conn"],
+    $ip=InputString["Enter the address (ip:port): "];
+    Put[$ip, "default_conn"];
+,
+    $ip = Get["default_conn"];
+];
 
 Print["starting zmq-like client..."];
 
-$cli = SocketConnect[{$ip,ToString[$port]},"TCP"];
+$cli = SocketConnect[$ip,"TCP"];
 
 stream = <|"raw"->CreateDataStructure["RingBuffer", 150], "length"->0, "residue"->{}, "promise"->Eval|>;
 
 $listen = SocketListen[$cli, Function[x,  
     
-        StringTemplate["received: `` bytes"][x["DataByteArray"] // Length]//Print;
+        StringTemplate["received: `` bytes"][x["DataByteArray"] // Length]//PrintDebug;
         stream["raw"]["PushBack", x["DataByteArray"]];
 
         (*handling the data*)
@@ -17,23 +21,23 @@ $listen = SocketListen[$cli, Function[x,
         Module[{data = {}, result},
 
             If[stream["length"] == 0,
-                Print["checking the incomming message"];
+                PrintDebug["checking the incomming message"];
                 (*check the residue*)
                 If[Length[stream["residue"]] > 0,
                     data = stream["residue"];
-                    Print["found residue..."];
+                    PrintDebug["found residue..."];
                     stream["residue"] = {};
                 ];
 
                 (*check if it contains 4 bytes and extract the length*)
                 While[True,
                     If[Length[data] >= 4,
-                        Print["length extracted..."];
+                        PrintDebug["length extracted..."];
                         stream["length"] = ImportByteArray[data[[1 ;; 4]], "UnsignedInteger32"][[1]];
                         data = Drop[data, 4];
                         Break[];
                     ,
-                        Print["add more bytes..."];
+                        PrintDebug["add more bytes..."];
                         If[stream["raw"]["EmptyQ"], Break[]];
                         If[Length[data] == 0,
                             data = stream["raw"]["PopBack"];
@@ -46,7 +50,7 @@ $listen = SocketListen[$cli, Function[x,
 
                 (*only of the length is known*)
                 If[stream["length"] != 0,
-                    StringTemplate["expect `` bytes"][stream["length"]]//Print;
+                    StringTemplate["expect `` bytes"][stream["length"]]//PrintDebug;
                     
                     While[True,
                         If[Length[data] >= stream["length"], Break[]];
@@ -55,7 +59,7 @@ $listen = SocketListen[$cli, Function[x,
                             stream["residue"] = data;
                             Break[];
                         ,
-                            Print["add more bytes for the payload..."];
+                            PrintDebug["add more bytes for the payload..."];
                             If[Length[data] == 0, 
                                 data = stream["raw"]["PopBack"]
                             ,
@@ -66,7 +70,7 @@ $listen = SocketListen[$cli, Function[x,
 
                     If[Length[data] >= stream["length"],
                         (*harvest the data*)
-                        Print["success!"];
+                        PrintDebug["success!"];
                         result = Take[data, stream["length"]];
                         stream["residue"] = Drop[data, stream["length"]];
                         stream["length"] = 0;    
@@ -77,12 +81,12 @@ $listen = SocketListen[$cli, Function[x,
                         stream["promise"] = Eval;               
                     ,
                         (*return back to the residue*)
-                        Print["not enough bytes..."];
+                        PrintDebug["not enough bytes..."];
                         stream["residue"] = data;                        
                     ];
                     
                 ,
-                    Print["not enough bytes to extract length..."];
+                    PrintDebug["not enough bytes to extract length..."];
                     (*return back to the residue*)
                     stream["residue"] = data;
                 ];
@@ -90,12 +94,12 @@ $listen = SocketListen[$cli, Function[x,
 
 
             ,
-                Print["continue transfering"];
+                PrintDebug["continue transfering"];
 
                 (*check the residue*)
                 If[Length[stream["residue"]] > 0,
                     data = stream["residue"];
-                    Print["found residue..."];
+                    PrintDebug["found residue..."];
                     stream["residue"] = {};
                 ];
 
@@ -106,7 +110,7 @@ $listen = SocketListen[$cli, Function[x,
                         stream["residue"] = data;
                         Break[];
                     ,
-                        Print["add more bytes for the payload..."];
+                        PrintDebug["add more bytes for the payload..."];
                         If[Length[data] == 0, 
                             data = stream["raw"]["PopBack"]
                         ,
@@ -116,7 +120,7 @@ $listen = SocketListen[$cli, Function[x,
                 ]   
                 If[Length[data] >= stream["length"],
                     (*harvest the data*)
-                    Print["success!"];
+                    PrintDebug["success!"];
                     result = Take[data, stream["length"]];
                     stream["residue"] = Drop[data, stream["length"]];
                     stream["length"] = 0;    
@@ -127,7 +131,7 @@ $listen = SocketListen[$cli, Function[x,
                     stream["promise"] = Eval;               
                 ,
                     (*return back to the residue*)
-                    Print["not enough bytes..."];
+                    PrintDebug["not enough bytes..."];
                     stream["residue"] = data;                        
                 ];                                
 
@@ -143,7 +147,7 @@ EvalAndReply[message_, src_]:=
     (*virtual env for evaluation*)
     Block[{socket = src}, 
         With[{data = message//ReleaseHold},
-            Print[data//ToString];
+            PrintDebug[data//ToString];
             SendAsync[data, src];
             data
         ]
@@ -154,7 +158,7 @@ Eval[message_, src_]:=
     (*virtual env for evaluation*)
     Block[{socket = src}, 
         With[{data = message//ReleaseHold},
-            Print[data//ToString];
+            PrintDebug[data//ToString];
             data
         ]
     ];
@@ -167,17 +171,3 @@ SendAsync[message_, src_, OptionsPattern[]]:=With[{socket = SocketObject[src], d
 
 SetAttributes[SendAsync, HoldFirst];
 Options[SendAsync] = {Promise -> Eval};
-            
-
-SendAsync["Hello!", $cli//First];
-
-(*something more interesting*)
-SendAsync[
- (*nice picture from tweet-a-program*)
- w := Random[]; 
- Graphics[{RGBColor[w, 0, .3], Thick, BSplineCurve[#]} & /@ 
-   Table[r (#[a] + #[6 a] + .3 w & /@ {Cos, Sin}), {r, 0, 20, .1}, {a,
-      0, 6.5, .05}]]
- 
- , $cli // First, 
- Promise -> Composition[CreateWindow, DialogNotebook, Eval]]
