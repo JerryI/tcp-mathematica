@@ -6,7 +6,7 @@ Implementation of the simple protocol to transfer arbitrary data over TCP betwee
 * The rest is payload
 * No additional separators
 * Fully asynchronous
-* Working effectively with byte arrays
+* It works effectively with byte arrays
 * TCP packet size doesn't matter
 
 ## server.wls
