@@ -18,7 +18,7 @@ To send arbitrary data to particular client use
 
 The argument `message` has the attribute `Hold`.
 `socket` is the of the connection with the particular client, basically it's `SocketObject[""]//First`.
-With the option `Promise` you can specify which function (`Handler`) will be used on upcoming reply from the client. It accepts two arguments: decoded `message` and the id of the socket.
+With the option `Promise` you can specify which function (`Handler`) will be used on upcoming reply from the client. It accepts two arguments: decoded `message` and the id of the socket. However, after the first received message, the handler function will be set back to the default.
 
 ## cli.wls
 It connects to the server and also listens. The default handler for incomming messages is `Eval` function.
