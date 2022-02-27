@@ -27,3 +27,18 @@ For sending messages the same function used
     SendAsync[message, socket, Promise-> Handler]
     
 In this case you have only one connection, therefore `socket = $cli//First`.
+
+##Example for Mathematica with a frontend
+All received messages will be send be default to the message window on the client site. You can use dynamics for your convinience
+    
+    Dynamic[result]
+
+    SendAsync[
+     Module[{w := Random[]},
+      (*from "tweet-a-program"*)
+      Graphics[{RGBColor[w, 0, .3], Thick, BSplineCurve[#]} & /@ 
+        Table[r (#[a] + #[6 a] + .3 w & /@ {Cos, Sin}), {r, 0, 
+          20, .1}, {a, 0, 6.5, .05}]]
+      ], $cli // First, Promise -> ((result = ReleaseHold[#1]) &)]
+  
+  Or even crazy - like `Promise -> Composition[CreateWindow, DialogNotebook, Eval]`
