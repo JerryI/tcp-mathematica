@@ -36,22 +36,22 @@ JTPServerStop::usage =
 
 
 JTPClientSend::usage = 
-"JTPClientSend[]"
+"JTPClientSend[address, expr]"
 
 
 JTPClientRead::usage = 
-"JTPClientRead[]"
+"JTPClientRead[address]"
 
 
 JTPClientEvaluate::usage = 
-"JTPClientEvaluate[]"
+"JTPClientEvaluate[address, expr]"
 
 
 (* ::Section:: *)
 (*Begin private*)
 
 
-Begin["`Private`"]
+(*Begin["`Private`"]*)
 
 
 (* ::Section:: *)
@@ -62,10 +62,10 @@ SetAttributes[serialize, HoldFirst]
 
 
 serialize[expr_] := 
-Block[{$data, $length}, 
-    $data = BinarySerialize[Hold[expr]]; 
-    $length = ExportByteArray[Length[$data], "UnsignedInteger32"]; 
-    Join[$length, $data]
+Module[{data, length}, 
+    data = BinarySerialize[Hold[expr]]; 
+    length = ExportByteArray[Length[data], "UnsignedInteger32"]; 
+    Join[length, data]
 ]
 
 
@@ -73,8 +73,11 @@ getLength[data_ByteArray] :=
 First[ImportByteArray[data[[1 ;; 4]], "UnsignedInteger32"]]
 
 
-deserialize[buffer_DataStructure?(DataStructureQ[#, "RingBuffer"]&)] := 
-BinaryDeserialize[Apply[Join, buffer["Elements"]]]
+deserialize[buffer_DataStructure?(DataStructureQ[#, "RingBuffer"]&), length_Integer] := 
+Module[{data = buffer["PopBack"]}, 
+	While[Length[data] < length, data = Join[data, buffer["PopBack"]]]; 
+	BinaryDeserialize[data]
+]
 
 
 (* ::Section:: *)
@@ -92,8 +95,8 @@ Module[{$expr = expr},
 ]
 
 
-evaluate[Evaluate, Hold[expr_]] := 
-Evaluate[expr]
+evaluate[func: _Symbol | _Function, Hold[expr_]] := 
+func[expr]
 
 
 result[kernel_LinkObject] := 
@@ -103,7 +106,7 @@ If[LinkReadyQ[kernel],
 ]
 
 
-selectKernel[Evaluate] := 
+selectKernel[{Evaluate}] := 
 Evaluate
 
 
@@ -162,7 +165,8 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 			"length" -> 0, 
 			"currentLength" -> 0, 
 			"result" -> Null
-		|>
+		|>; 
+		writeLog[server["log"], "Received "]
 	]; 
 	Which[
 		get["status"] == "Empty",
@@ -176,7 +180,7 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 			get["data"]["PopBack", data]; 
 	]; 
 	Which[get["length"] == get["currentLength"],  
-		set["result", evalaute[selectKernel[server["kernels"]], get["data"]]; 
+		set["result", evalaute[selectKernel[server["kernels"]], get["data"]]]; 
 		set["status", "Ready"]; 
 		get["data"]["DropAll"]; 
 		set["length", 0]; 
@@ -278,11 +282,21 @@ symbol[[ToString[key]]] = value
 (*Client*)
 
 
+SetAttributes[JTPClientEvaluate, HoldRest]
+
+
+JTPClientEvaluate[{host_String, port_Integer}, expr_] := 
+Module[{socket = SocketConnect[{host, port}, "TCP"]}, 
+	Write[socket, serialize[expr]]; 
+	SocketReadMessage[socket]; 
+]
+
+
 (* ::Section:: *)
 (*End private*)
 
 
-End[] (*`Private`*)
+(*End[]*) (*`Private`*)
 
 
 (* ::Section:: *)
