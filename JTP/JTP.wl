@@ -286,6 +286,13 @@ JTPServerStart[JTPServer[server_Symbol?AssociationQ]] := (
 	JTPServer[server]
 )
 
+JTPServer /: 
+JTPSend[uuid_, exp_] := (
+	BinaryWrite[SocketObject[uuid], serialize[Hold[expr]]]
+)
+
+SetAttributes[JTPSend, HoldRest]
+
 
 JTPServer[server_Symbol?AssociationQ][keys__String] := 
 server[keys]
