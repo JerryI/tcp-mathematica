@@ -58,12 +58,10 @@ JTPClientEvaluate::usage =
 (*Serialization*)
 
 
-SetAttributes[serialize, HoldFirst]
-
 
 serialize[expr_] := 
 Module[{data, length}, 
-    data = BinarySerialize[Hold[expr]]; 
+    data = BinarySerialize[expr]; 
     length = ExportByteArray[Length[data], "UnsignedInteger32"]; 
     Join[length, data]
 ]
@@ -83,7 +81,7 @@ Module[{data = buffer["Pop"]},
 (* ::Section:: *)
 (*Evaluation*)
 
-
+(*
 evaluate[kernel_, Hold[expr_]] := 
 Module[{$expr = expr}, 
     With[{$def = Language`ExtendedFullDefinition[$expr]}, 
@@ -92,17 +90,16 @@ Module[{$expr = expr},
             Missing[StringTemplate["Kernel [``] not ready"][kernel]]
         ]
     ]
-]
+]*)
 
-evaluate[expr_] := 
-Block[{client = uuid},
-	expr//ReleaseHold
+evaluate[uuid_, expr_] := 
+(*virtual env*)
+Block[{socket = uuid},
+	ReleaseHold[expr]
 ]
 
 reply[uuid_String, expr_] := 
 BinaryWrite[SocketObject[uuid], serialize[expr]]
-
-SetAttributes[evaluate, HoldRest]
 
 
 (*evaluate[func: _Symbol | _Function, Hold[expr_]] := 
@@ -135,7 +132,7 @@ Table[LinkLaunch["mathkernel -mathlink"], {n}]
 writeLog[log_, message_String, args___] := 
 Block[{$message = StringTemplate[message][args]}, 
     log["Append", $message]; 
-    Print[$message]; 
+     
     Return[$message]
 ]
 
@@ -219,7 +216,7 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 		get["length"] == get["currentLength"],  
 			writeLog[server[["log"]], "[<*Now*>] The length was matched"];
 
-			get["promise"][uuid, evaluate[deserialize@@{get["data"], get["length"]}]]; 
+			server["promise"][uuid, evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
 
 			set["status", "Empty"]; 
 			get["data"]["DropAll"]; 
@@ -328,7 +325,11 @@ symbol[[ToString[key]]] = value
 
 SetAttributes[JTPClientEvaluate, HoldRest]
 
-SetAttributes[JTPClientSend, HoldRest]
+SetAttributes[JTPClientEvaluateAsync, HoldRest]
+
+Options[JTPClientEvaluateAsync] = {
+    Promise -> Null
+}
 
 JTPClient /: 
 JTPClientEvaluate[JTPClient[server_Symbol?AssociationQ], expr_] :=
@@ -338,8 +339,24 @@ Module[{raw, length},
 	length = getLength[Take[raw, 4]];
 	raw = Drop[raw, 4];
 	While[Length[raw] < length, raw = Join[raw, SocketReadMessage[server["socket"]]]];
-	raw // BinaryDeserialize
+	raw // BinaryDeserialize // ReleaseHold
 ]
+
+JTPClient /: 
+JTPClientEvaluateAsync[JTPClient[server_Symbol?AssociationQ], expr_, opts___?OptionQ] :=
+Module[{}, 
+	server["listener"] = SocketListen[server["socket"], server["handler"]];
+	With[{listener = server["listener"]},
+		server["promise"] = Composition[Function[x, DeleteObject[listener]], OptionValue[JTPClientEvaluateAsync, Flatten[{opts}], Promise]];
+	];
+	
+	server["status"] = "temporary listening";
+	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient temporary listening"][]];
+
+	BinaryWrite[server["socket"], serialize[expr]]; 
+]
+
+SetAttributes[JTPClientSend, HoldRest]
 
 JTPClient /: 
 JTPClientSend[JTPClient[server_Symbol?AssociationQ], expr_] :=
@@ -404,12 +421,17 @@ JTPClientStart[JTPClient[server_Symbol?AssociationQ]] := (
 
 
 JTPClient /: 
-JTPClientStartListening[JTPClient[server_Symbol?AssociationQ]] := (
+JTPClientStartListening[JTPClient[server_Symbol?AssociationQ], opts___?OptionQ] := (
 	server["listener"] = SocketListen[server["socket"], server["handler"]];
+	server["promise"] = OptionValue[JTPClientStartListening, Flatten[{opts}], Promise];
 	server["status"] = "listening";
 	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient listening"][]]; 
 	JTPClient[server]
 )
+
+Options[JTPClientStartListening] = {
+    Promise -> Null
+}
 
 JTPClient /: 
 JTPClientStopListening[JTPClient[server_Symbol?AssociationQ]] := (

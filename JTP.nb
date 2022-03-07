@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     23378,        520]
-NotebookOptionsPosition[     21955,        487]
-NotebookOutlinePosition[     22422,        504]
-CellTagsIndexPosition[     22379,        501]
+NotebookDataLength[     27877,        651]
+NotebookOptionsPosition[     24845,        591]
+NotebookOutlinePosition[     25276,        608]
+CellTagsIndexPosition[     25233,        605]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -25,6 +25,10 @@ Cell[BoxData[{
     RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ";"}], " "}], "\n", 
  RowBox[{"<<", "JTP`"}]}], "Code",
  CellLabel->"In[1]:=",ExpressionUUID->"5c0ac8d6-df1c-4ba2-ac00-8cf4ea0d4c28"],
+
+Cell[CellGroupData[{
+
+Cell["Start the server", "Subsection",ExpressionUUID->"552299f6-a2b0-4af3-86bd-c32d2500e866"],
 
 Cell[CellGroupData[{
 
@@ -140,10 +144,10 @@ Cell[BoxData[
   Editable->False,
   SelectWithContents->True,
   Selectable->False]], "Output",
- CellLabel->"Out[3]=",ExpressionUUID->"e7aab3d0-21df-4028-8600-c43e2b46233e"]
+ CellLabel->"Out[3]=",ExpressionUUID->"938f8cd7-9b45-4331-bfe7-5a5da332ad06"]
 }, Open  ]],
 
-Cell[CellGroupData[{
+Cell["Server logs", "Text",ExpressionUUID->"4b41df89-a434-4129-ad0d-4c35b9d81fec"],
 
 Cell[BoxData[
  RowBox[{
@@ -152,17 +156,12 @@ Cell[BoxData[
     RowBox[{"obj", "[", "\"\<log\>\"", "]"}], "[", "\"\<Elements\>\"", "]"}], 
    "//", "TableForm"}], "//", "Dynamic"}]], "Input",
  InitializationCell->True,
- CellLabel->"In[4]:=",ExpressionUUID->"ef8ee62d-9476-473b-b39d-e15b3ce9e88b"],
-
-Cell[BoxData[
- DynamicBox[ToBoxes[
-   TableForm[
-    JTP`obj["log"]["Elements"]], StandardForm],
-  ImageSizeCache->{159.85937030911447`, {3., 9.}}]], "Output",
- CellLabel->"Out[4]=",ExpressionUUID->"01e3e26b-0dec-4a4f-9aae-aba46c64a7d4"]
+ CellLabel->"In[4]:=",ExpressionUUID->"ef8ee62d-9476-473b-b39d-e15b3ce9e88b"]
 }, Open  ]],
 
-Cell["Test client", "Text",ExpressionUUID->"eef9990d-5a5b-459e-ac55-d137b084a7aa"],
+Cell[CellGroupData[{
+
+Cell["Start the client", "Subsection",ExpressionUUID->"eef9990d-5a5b-459e-ac55-d137b084a7aa"],
 
 Cell[CellGroupData[{
 
@@ -174,6 +173,7 @@ Cell[BoxData[
      RowBox[{"\"\<port\>\"", "->", "257"}], ",", " ", 
      RowBox[{"\"\<host\>\"", "->", "\"\<127.0.0.1\>\""}]}], "]"}], "//", 
    "JTPClientStart"}]}]], "Input",
+ InitializationCell->True,
  CellLabel->"In[5]:=",ExpressionUUID->"4a4bd7a6-eb0b-40a6-8cf7-052fefbbf0db"],
 
 Cell[BoxData[
@@ -278,217 +278,321 @@ Cell[BoxData[
   Editable->False,
   SelectWithContents->True,
   Selectable->False]], "Output",
- CellLabel->"Out[5]=",ExpressionUUID->"84176242-44bb-4383-ad8a-0ce7993ed1f1"]
+ CellLabel->"Out[5]=",ExpressionUUID->"45f0b79b-a943-4918-a787-2b924208a424"]
 }, Open  ]],
+
+Cell["client logs", "Text",ExpressionUUID->"85c73169-c761-4ff9-9d7a-5cb480fdc11e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"cli", "[", "\"\<log\>\"", "]"}], "[", "\"\<Elements\>\"", "]"}], 
+   "//", "TableForm"}], "//", "Dynamic"}]], "Input",
+ InitializationCell->True,
+ CellLabel->"In[6]:=",ExpressionUUID->"e9a31737-3f4c-44bd-abbf-ed6fb4a683fc"],
+
+Cell[CellGroupData[{
+
+Cell["Sync evaluation on the server", "Subsubsection",ExpressionUUID->"1ac66977-937e-47d1-b4a5-b23abae9766b"],
 
 Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{"JTPClientEvaluate", "[", 
-  RowBox[{
-   InterpretationBox[
-    RowBox[{
-     TagBox["JTPClient",
-      "SummaryHead"], "[", 
-     DynamicModuleBox[{Typeset`open$$ = False, Typeset`embedState$$ = 
-      "Ready"}, 
-      TemplateBox[{
-        PaneSelectorBox[{False -> GridBox[{{
-              PaneBox[
-               ButtonBox[
-                DynamicBox[
-                 FEPrivate`FrontEndResource["FEBitmaps", "SummaryBoxOpener"]],
-                 ButtonFunction :> (Typeset`open$$ = True), Appearance -> 
-                None, BaseStyle -> {}, Evaluator -> Automatic, Method -> 
-                "Preemptive"], Alignment -> {Center, Center}, ImageSize -> 
-               Dynamic[{
-                 Automatic, 
-                  3.5 (CurrentValue["FontCapHeight"]/AbsoluteCurrentValue[
-                   Magnification])}]], "", 
-              GridBox[{{
-                 RowBox[{
-                   TagBox["\"port: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox["257", "SummaryItem"]}], "\[SpanFromLeft]"}, {
-                 RowBox[{
-                   TagBox["\"host: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox["\"127.0.0.1\"", "SummaryItem"]}], 
-                 "\[SpanFromLeft]"}, {
-                 RowBox[{
-                   TagBox["\"status: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox["\"started\"", "SummaryItem"]}], 
-                 "\[SpanFromLeft]"}}, 
-               GridBoxAlignment -> {
-                "Columns" -> {{Left}}, "Rows" -> {{Automatic}}}, AutoDelete -> 
-               False, GridBoxItemSize -> {
-                "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
-               GridBoxSpacings -> {
-                "Columns" -> {{2}}, "Rows" -> {{Automatic}}}, 
-               BaseStyle -> {
-                ShowStringCharacters -> False, NumberMarks -> False, 
-                 PrintPrecision -> 3, ShowSyntaxStyles -> False}]}}, 
-            GridBoxAlignment -> {"Columns" -> {{Left}}, "Rows" -> {{Top}}}, 
-            AutoDelete -> False, 
-            GridBoxItemSize -> {
-             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
-            BaselinePosition -> {1, 1}], True -> GridBox[{{
-              PaneBox[
-               ButtonBox[
-                DynamicBox[
-                 FEPrivate`FrontEndResource["FEBitmaps", "SummaryBoxCloser"]],
-                 ButtonFunction :> (Typeset`open$$ = False), Appearance -> 
-                None, BaseStyle -> {}, Evaluator -> Automatic, Method -> 
-                "Preemptive"], Alignment -> {Center, Center}, ImageSize -> 
-               Dynamic[{
-                 Automatic, 
-                  3.5 (CurrentValue["FontCapHeight"]/AbsoluteCurrentValue[
-                   Magnification])}]], "", 
-              GridBox[{{
-                 RowBox[{
-                   TagBox["\"port: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox["257", "SummaryItem"]}], "\[SpanFromLeft]"}, {
-                 RowBox[{
-                   TagBox["\"host: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox["\"127.0.0.1\"", "SummaryItem"]}], 
-                 "\[SpanFromLeft]"}, {
-                 RowBox[{
-                   TagBox["\"status: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox["\"started\"", "SummaryItem"]}], 
-                 "\[SpanFromLeft]"}, {
-                 RowBox[{
-                   TagBox["\"kernels: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox[
-                    RowBox[{"{", "Evaluate", "}"}], "SummaryItem"]}], 
-                 "\[SpanFromLeft]"}, {
-                 RowBox[{
-                   TagBox["\"self: \"", "SummaryItemAnnotation"], 
-                   "\[InvisibleSpace]", 
-                   TagBox["JTP`Objects`Client$12", "SummaryItem"]}], 
-                 "\[SpanFromLeft]"}}, 
-               GridBoxAlignment -> {
-                "Columns" -> {{Left}}, "Rows" -> {{Automatic}}}, AutoDelete -> 
-               False, GridBoxItemSize -> {
-                "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
-               GridBoxSpacings -> {
-                "Columns" -> {{2}}, "Rows" -> {{Automatic}}}, 
-               BaseStyle -> {
-                ShowStringCharacters -> False, NumberMarks -> False, 
-                 PrintPrecision -> 3, ShowSyntaxStyles -> False}]}}, 
-            GridBoxAlignment -> {"Columns" -> {{Left}}, "Rows" -> {{Top}}}, 
-            AutoDelete -> False, 
-            GridBoxItemSize -> {
-             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
-            BaselinePosition -> {1, 1}]}, 
-         Dynamic[Typeset`open$$], ImageSize -> Automatic]},
-       "SummaryPanel"],
-      DynamicModuleValues:>{}], "]"}],
-    JTP`JTPClient[JTP`Objects`Client$12],
-    Editable->False,
-    SelectWithContents->True,
-    Selectable->False], ",", " ", 
-   GraphicsBox[
-    TagBox[RasterBox[CompressedData["
-1:eJztmF1P21YYx9F2s8t9hd3kwjeZRC6wtGRaKBIIgWiiiMKWMkizJqkgLYE2
-yyiBUVaipCoRg8FSwSB0oiBhiU84+/gc28c+x3aSdhfb/yeBwH7OOc+L/bz4
-q6Vy6qfPhoaGKl/ov1KLL75bXV38Of2l/k9mpVJ8vJJ/NLGyln+cXx1Z+ly/
-+IP+09Z/jL8jAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+O8SmFos8D5JSYWV4
-KlssZiei/6KCn5ipYSVQxusj3lOy+7ycRyo78+2I3JPRkfHZHJHLzY5zcpO1
-0zueZl6mea5xZYpc7cyHdUm/KMPfzKSnYr4C1Ca3SRyG5fflD2HkTvuwl/va
-Xxevj3hPye7zcmKp2+7+eorXXhkr7L270Tgx7f3B00l6P5F72SC87VwHhCzx
-9He6j9bI+Rs5GD/+Zip8WpsU3lfnavvdW5fpZ60nLunxyh+3/hbp3F1spoL0
-sXwk8ZTz/mHXvHfdeWtde5Y2pFjI2J22FRatU5tm77oyXeuwyzfnhy1D8M+/
-DUmvFdZD4GOger9cbzTqpU+cGfNNUxNhyGybmEm6TR9uBYqHsShysj7aq3q+
-+8p1Z8vsO0q89MaMvtbMk5gp2V2WyJqFuCNlR5MP5zzO8FEk+cCVnBelGUsZ
-vifLVnSX78cUogIRy83es2uJley3j01NLlvPPYVDyTfNgJ1uTDurkMMmpu7z
-1qW5z/G2XPWF4FLWg6d6C5lOdvfacTH2ZN807vp1GL18FGFqWIgf/7HlFp+u
-9ARcsf1KdzndKFQO3tuZWjvfXVB5DYRQtSyhNwWZUR51xarHMlU9vQY7phdP
-9R2yTnVc12i5bS6+3s0OqEj6mStRC0Km5pvmK33bNbKVlai19rLKG2NKnbUb
-7TMaYNrNWCVBVA9oQbDfMn2LvZKw32PqWjWne2hv8zKX4AwO45rwnuoxZGqB
-JsbLrYz+7/TGmbn4qJKIhCBM5pfqoyy8JmdfNfMqu5TZuiDCrL7bIWNSbJV7
-P/9altn8y9FNaTfvWrVHwtAFWJTIFh4m+ynKA4aMpvtybe+YJhvtqDLqXOtb
-fMMqEqCP9eg7q4ZVkugzwxZf/jrH/Gs1UXwi8A1ZhHSMztRK37mdBZUXC9V+
-9MGAIePRi4fV5Oca1Kj2ss90E1KRAH38qxCVFiyWnBkUMoLewJTrbW5+udjK
-OF+2IIvIrCA/QMqAIWPp/lWtnJtNCmdkM08OpkiAPm5teKrZmGTxICFjRCdK
-jXPhvOhv0WSVzArBB3hXfsT2g4c1I2GGxSBFAvQZr3ZMl9HxIuzijxEy5wJ+
-H1+LMlvmBBBmezXuHJFG10/MbUmXJ1Olr5DZY5lzuiZEk0nVLT5Q+5HavBCf
-FInG4zHpYsmZzJ2i/JCc8LYalhP5BVbPLCoNTBuprZys3uS09USmNw2bB66e
-QbJvXyFzNN5GlTveM44srtXJtwLmI/tbpXfwpMOr43OmZ8a1BlN1uc167+7h
-zlqRnNQ6PL/RLA3Dh8yaKPXavFnmtTF2IZ89iAeJPWxW8DiRPUjGPLDmGqUT
-laPQIZvfDtHsRKRWuowNyB1KfGnnzPU1jri1Pu9ymgD38CrAcXw0te5p4wzv
-7pcTUmNkb7YyXT1xa01F0r8I7CHBrc15nKjmG26VrNPphy8/7zkUGp7Klmuv
-jMpcX3M1DTxsKLTnPwYbO713xOfpTyNrU7LOzOL64slBh1c/EdfxDsvISTPO
-b1YCY6yt6VFO9I6wRLdyiZCPYuwYQePlMZ7a7tFYiadLgd4DAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AOB/xT9GrxCO
-      "], {{0, 55.199999999999996`}, {87., 0}}, {0, 255},
-      ColorFunction->RGBColor,
-      ImageResolution->{120., 120.},
-      SmoothingQuality->"High"],
-     BoxForm`ImageTag["Byte", ColorSpace -> "RGB", Interleaving -> True],
-     Selectable->False],
-    DefaultBaseStyle->"ImageGraphics",
-    ImageSize->Automatic,
-    ImageSizeRaw->{87., 55.199999999999996`},
-    PlotRange->{{0, 87.}, {0, 55.199999999999996`}}]}], "]"}]], "Input",
- CellLabel->"In[6]:=",ExpressionUUID->"34a47fec-a020-40f1-a390-efec11b5a804"],
+  RowBox[{"cli", ",", " ", "Now"}], "]"}]], "Input",
+ CellLabel->"In[7]:=",ExpressionUUID->"34a47fec-a020-40f1-a390-efec11b5a804"],
 
 Cell[BoxData[
- RowBox[{"Hold", "[", 
-  GraphicsBox[
-   TagBox[RasterBox[CompressedData["
-1:eJztmF1P21YYx9F2s8t9hd3kwjeZRC6wtGRaKBIIgWiiiMKWMkizJqkgLYE2
-yyiBUVaipCoRg8FSwSB0oiBhiU84+/gc28c+x3aSdhfb/yeBwH7OOc+L/bz4
-q6Vy6qfPhoaGKl/ov1KLL75bXV38Of2l/k9mpVJ8vJJ/NLGyln+cXx1Z+ly/
-+IP+09Z/jL8jAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+O8SmFos8D5JSYWV4
-KlssZiei/6KCn5ipYSVQxusj3lOy+7ycRyo78+2I3JPRkfHZHJHLzY5zcpO1
-0zueZl6mea5xZYpc7cyHdUm/KMPfzKSnYr4C1Ca3SRyG5fflD2HkTvuwl/va
-Xxevj3hPye7zcmKp2+7+eorXXhkr7L270Tgx7f3B00l6P5F72SC87VwHhCzx
-9He6j9bI+Rs5GD/+Zip8WpsU3lfnavvdW5fpZ60nLunxyh+3/hbp3F1spoL0
-sXwk8ZTz/mHXvHfdeWtde5Y2pFjI2J22FRatU5tm77oyXeuwyzfnhy1D8M+/
-DUmvFdZD4GOger9cbzTqpU+cGfNNUxNhyGybmEm6TR9uBYqHsShysj7aq3q+
-+8p1Z8vsO0q89MaMvtbMk5gp2V2WyJqFuCNlR5MP5zzO8FEk+cCVnBelGUsZ
-vifLVnSX78cUogIRy83es2uJley3j01NLlvPPYVDyTfNgJ1uTDurkMMmpu7z
-1qW5z/G2XPWF4FLWg6d6C5lOdvfacTH2ZN807vp1GL18FGFqWIgf/7HlFp+u
-9ARcsf1KdzndKFQO3tuZWjvfXVB5DYRQtSyhNwWZUR51xarHMlU9vQY7phdP
-9R2yTnVc12i5bS6+3s0OqEj6mStRC0Km5pvmK33bNbKVlai19rLKG2NKnbUb
-7TMaYNrNWCVBVA9oQbDfMn2LvZKw32PqWjWne2hv8zKX4AwO45rwnuoxZGqB
-JsbLrYz+7/TGmbn4qJKIhCBM5pfqoyy8JmdfNfMqu5TZuiDCrL7bIWNSbJV7
-P/9altn8y9FNaTfvWrVHwtAFWJTIFh4m+ynKA4aMpvtybe+YJhvtqDLqXOtb
-fMMqEqCP9eg7q4ZVkugzwxZf/jrH/Gs1UXwi8A1ZhHSMztRK37mdBZUXC9V+
-9MGAIePRi4fV5Oca1Kj2ss90E1KRAH38qxCVFiyWnBkUMoLewJTrbW5+udjK
-OF+2IIvIrCA/QMqAIWPp/lWtnJtNCmdkM08OpkiAPm5teKrZmGTxICFjRCdK
-jXPhvOhv0WSVzArBB3hXfsT2g4c1I2GGxSBFAvQZr3ZMl9HxIuzijxEy5wJ+
-H1+LMlvmBBBmezXuHJFG10/MbUmXJ1Olr5DZY5lzuiZEk0nVLT5Q+5HavBCf
-FInG4zHpYsmZzJ2i/JCc8LYalhP5BVbPLCoNTBuprZys3uS09USmNw2bB66e
-QbJvXyFzNN5GlTveM44srtXJtwLmI/tbpXfwpMOr43OmZ8a1BlN1uc167+7h
-zlqRnNQ6PL/RLA3Dh8yaKPXavFnmtTF2IZ89iAeJPWxW8DiRPUjGPLDmGqUT
-laPQIZvfDtHsRKRWuowNyB1KfGnnzPU1jri1Pu9ymgD38CrAcXw0te5p4wzv
-7pcTUmNkb7YyXT1xa01F0r8I7CHBrc15nKjmG26VrNPphy8/7zkUGp7Klmuv
-jMpcX3M1DTxsKLTnPwYbO713xOfpTyNrU7LOzOL64slBh1c/EdfxDsvISTPO
-b1YCY6yt6VFO9I6wRLdyiZCPYuwYQePlMZ7a7tFYiadLgd4DAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AOB/xT9GrxCO
-     "], {{0, 55.199999999999996`}, {87., 0}}, {0, 255},
-     ColorFunction->RGBColor,
-     ImageResolution->{120., 120.}],
-    BoxForm`ImageTag["Byte", ColorSpace -> "RGB", Interleaving -> True],
-    Selectable->False],
-   DefaultBaseStyle->"ImageGraphics",
-   ImageSizeRaw->{87., 55.199999999999996`},
-   PlotRange->{{0, 87.}, {0, 55.199999999999996`}}], "]"}]], "Output",
- CellLabel->"Out[6]=",ExpressionUUID->"921ef030-3506-43d7-b517-96a54220cfb0"]
+ TemplateBox[{
+   RowBox[{"\"Mon 7 Mar 2022 22:03:52\"", 
+     StyleBox[
+      RowBox[{"\"GMT+\"", "\[InvisibleSpace]", 
+        StyleBox["1", NumberMarks -> False, StripOnInput -> False]}], 
+      FontColor -> GrayLevel[0.5]]}], 
+   RowBox[{"DateObject", "[", 
+     RowBox[{
+       RowBox[{"{", 
+         RowBox[{
+          "2022", ",", "3", ",", "7", ",", "22", ",", "3", ",", 
+           "52.4207339`9.472077944184882"}], "}"}], ",", "\"Instant\"", ",", 
+       "\"Gregorian\"", ",", "1.`"}], "]"}]},
+  "DateObject",
+  Editable->False]], "Output",
+ CellLabel->"Out[7]=",ExpressionUUID->"a76e066c-ad3e-49dc-808b-d590582f9bc9"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Async evaluation", "Subsubsection",ExpressionUUID->"1258a091-53f8-4b8f-819d-2c9f381d10f5"],
+
+Cell[BoxData[
+ RowBox[{"JTPClientEvaluateAsync", "[", 
+  RowBox[{"cli", ",", "Now", ",", 
+   RowBox[{"Promise", "->", 
+    RowBox[{"Function", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"x", ",", "y"}], "}"}], ",", 
+      RowBox[{"CreateWindow", "[", 
+       RowBox[{"DialogNotebook", "[", "y", "]"}], "]"}]}], "]"}]}]}], 
+  "]"}]], "Input",
+ CellLabel->"In[8]:=",ExpressionUUID->"240366b8-c971-4a73-b621-a39b53b99e40"],
+
+Cell[TextData[StyleBox["Listening mode", "Subsubsection"]], "Text",ExpressionUUID->"2969a1ed-58db-4934-b2fd-5415883ef2de"],
+
+Cell["no reply", "Text",ExpressionUUID->"63708a68-128a-4759-88ae-e78781b7e2a7"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"JTPClientStartListening", "[", 
+  RowBox[{"cli", ",", 
+   RowBox[{"Promise", "->", 
+    RowBox[{"Function", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"x", ",", "y"}], "}"}], ",", 
+      RowBox[{"CreateWindow", "[", 
+       RowBox[{"DialogNotebook", "[", "y", "]"}], "]"}]}], "]"}]}]}], 
+  "]"}]], "Input",
+ CellLabel->"In[9]:=",ExpressionUUID->"50fa48ce-d466-4431-9fad-a199654733bd"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{
+   TagBox["JTPClient",
+    "SummaryHead"], "[", 
+   DynamicModuleBox[{Typeset`open$$ = False, Typeset`embedState$$ = "Ready"}, 
+    TemplateBox[{
+      PaneSelectorBox[{False -> GridBox[{{
+            PaneBox[
+             ButtonBox[
+              DynamicBox[
+               FEPrivate`FrontEndResource["FEBitmaps", "SummaryBoxOpener"]], 
+              ButtonFunction :> (Typeset`open$$ = True), Appearance -> None, 
+              BaseStyle -> {}, Evaluator -> Automatic, Method -> 
+              "Preemptive"], Alignment -> {Center, Center}, ImageSize -> 
+             Dynamic[{
+               Automatic, 
+                3.5 (CurrentValue["FontCapHeight"]/AbsoluteCurrentValue[
+                 Magnification])}]], "", 
+            GridBox[{{
+               RowBox[{
+                 TagBox["\"port: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["257", "SummaryItem"]}], "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"host: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"127.0.0.1\"", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"status: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"listening\"", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}}, 
+             GridBoxAlignment -> {
+              "Columns" -> {{Left}}, "Rows" -> {{Automatic}}}, AutoDelete -> 
+             False, GridBoxItemSize -> {
+              "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+             GridBoxSpacings -> {"Columns" -> {{2}}, "Rows" -> {{Automatic}}},
+              BaseStyle -> {
+              ShowStringCharacters -> False, NumberMarks -> False, 
+               PrintPrecision -> 3, ShowSyntaxStyles -> False}]}}, 
+          GridBoxAlignment -> {"Columns" -> {{Left}}, "Rows" -> {{Top}}}, 
+          AutoDelete -> False, 
+          GridBoxItemSize -> {
+           "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+          BaselinePosition -> {1, 1}], True -> GridBox[{{
+            PaneBox[
+             ButtonBox[
+              DynamicBox[
+               FEPrivate`FrontEndResource["FEBitmaps", "SummaryBoxCloser"]], 
+              ButtonFunction :> (Typeset`open$$ = False), Appearance -> None, 
+              BaseStyle -> {}, Evaluator -> Automatic, Method -> 
+              "Preemptive"], Alignment -> {Center, Center}, ImageSize -> 
+             Dynamic[{
+               Automatic, 
+                3.5 (CurrentValue["FontCapHeight"]/AbsoluteCurrentValue[
+                 Magnification])}]], "", 
+            GridBox[{{
+               RowBox[{
+                 TagBox["\"port: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["257", "SummaryItem"]}], "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"host: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"127.0.0.1\"", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"status: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"listening\"", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"kernels: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox[
+                  RowBox[{"{", "Evaluate", "}"}], "SummaryItem"]}], 
+               "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"self: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["JTP`Objects`Client$12", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}}, 
+             GridBoxAlignment -> {
+              "Columns" -> {{Left}}, "Rows" -> {{Automatic}}}, AutoDelete -> 
+             False, GridBoxItemSize -> {
+              "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+             GridBoxSpacings -> {"Columns" -> {{2}}, "Rows" -> {{Automatic}}},
+              BaseStyle -> {
+              ShowStringCharacters -> False, NumberMarks -> False, 
+               PrintPrecision -> 3, ShowSyntaxStyles -> False}]}}, 
+          GridBoxAlignment -> {"Columns" -> {{Left}}, "Rows" -> {{Top}}}, 
+          AutoDelete -> False, 
+          GridBoxItemSize -> {
+           "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+          BaselinePosition -> {1, 1}]}, 
+       Dynamic[Typeset`open$$], ImageSize -> Automatic]},
+     "SummaryPanel"],
+    DynamicModuleValues:>{}], "]"}],
+  JTP`JTPClient[JTP`Objects`Client$12],
+  Editable->False,
+  SelectWithContents->True,
+  Selectable->False]], "Output",
+ CellLabel->"Out[9]=",ExpressionUUID->"4770cc78-df85-4d38-834b-2f4879b9ec30"]
+}, Open  ]],
+
+Cell["async send to the server", "Text",ExpressionUUID->"6c2ef0b7-aa7b-45d1-8f06-f796f1bef08c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"JTPClientSend", "[", 
+   RowBox[{"cli", ",", " ", "Now"}], "]"}], ";"}]], "Input",
+ CellLabel->"In[15]:=",ExpressionUUID->"35671d8f-e751-46f5-a58d-0ed17b5feabe"],
+
+Cell["stop listening", "Text",ExpressionUUID->"36205fee-916d-4a90-a5f3-019477af4416"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"JTPClientStopListening", "[", "cli", "]"}]], "Input",
+ CellLabel->"In[14]:=",ExpressionUUID->"60404616-3bcc-4523-971b-8180b7a343bb"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{
+   TagBox["JTPClient",
+    "SummaryHead"], "[", 
+   DynamicModuleBox[{Typeset`open$$ = False, Typeset`embedState$$ = "Ready"}, 
+    TemplateBox[{
+      PaneSelectorBox[{False -> GridBox[{{
+            PaneBox[
+             ButtonBox[
+              DynamicBox[
+               FEPrivate`FrontEndResource["FEBitmaps", "SummaryBoxOpener"]], 
+              ButtonFunction :> (Typeset`open$$ = True), Appearance -> None, 
+              BaseStyle -> {}, Evaluator -> Automatic, Method -> 
+              "Preemptive"], Alignment -> {Center, Center}, ImageSize -> 
+             Dynamic[{
+               Automatic, 
+                3.5 (CurrentValue["FontCapHeight"]/AbsoluteCurrentValue[
+                 Magnification])}]], "", 
+            GridBox[{{
+               RowBox[{
+                 TagBox["\"port: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["257", "SummaryItem"]}], "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"host: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"127.0.0.1\"", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"status: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"started\"", "SummaryItem"]}], "\[SpanFromLeft]"}}, 
+             GridBoxAlignment -> {
+              "Columns" -> {{Left}}, "Rows" -> {{Automatic}}}, AutoDelete -> 
+             False, GridBoxItemSize -> {
+              "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+             GridBoxSpacings -> {"Columns" -> {{2}}, "Rows" -> {{Automatic}}},
+              BaseStyle -> {
+              ShowStringCharacters -> False, NumberMarks -> False, 
+               PrintPrecision -> 3, ShowSyntaxStyles -> False}]}}, 
+          GridBoxAlignment -> {"Columns" -> {{Left}}, "Rows" -> {{Top}}}, 
+          AutoDelete -> False, 
+          GridBoxItemSize -> {
+           "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+          BaselinePosition -> {1, 1}], True -> GridBox[{{
+            PaneBox[
+             ButtonBox[
+              DynamicBox[
+               FEPrivate`FrontEndResource["FEBitmaps", "SummaryBoxCloser"]], 
+              ButtonFunction :> (Typeset`open$$ = False), Appearance -> None, 
+              BaseStyle -> {}, Evaluator -> Automatic, Method -> 
+              "Preemptive"], Alignment -> {Center, Center}, ImageSize -> 
+             Dynamic[{
+               Automatic, 
+                3.5 (CurrentValue["FontCapHeight"]/AbsoluteCurrentValue[
+                 Magnification])}]], "", 
+            GridBox[{{
+               RowBox[{
+                 TagBox["\"port: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["257", "SummaryItem"]}], "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"host: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"127.0.0.1\"", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"status: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["\"started\"", "SummaryItem"]}], "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"kernels: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox[
+                  RowBox[{"{", "Evaluate", "}"}], "SummaryItem"]}], 
+               "\[SpanFromLeft]"}, {
+               RowBox[{
+                 TagBox["\"self: \"", "SummaryItemAnnotation"], 
+                 "\[InvisibleSpace]", 
+                 TagBox["JTP`Objects`Client$12", "SummaryItem"]}], 
+               "\[SpanFromLeft]"}}, 
+             GridBoxAlignment -> {
+              "Columns" -> {{Left}}, "Rows" -> {{Automatic}}}, AutoDelete -> 
+             False, GridBoxItemSize -> {
+              "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+             GridBoxSpacings -> {"Columns" -> {{2}}, "Rows" -> {{Automatic}}},
+              BaseStyle -> {
+              ShowStringCharacters -> False, NumberMarks -> False, 
+               PrintPrecision -> 3, ShowSyntaxStyles -> False}]}}, 
+          GridBoxAlignment -> {"Columns" -> {{Left}}, "Rows" -> {{Top}}}, 
+          AutoDelete -> False, 
+          GridBoxItemSize -> {
+           "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}, 
+          BaselinePosition -> {1, 1}]}, 
+       Dynamic[Typeset`open$$], ImageSize -> Automatic]},
+     "SummaryPanel"],
+    DynamicModuleValues:>{}], "]"}],
+  JTP`JTPClient[JTP`Objects`Client$12],
+  Editable->False,
+  SelectWithContents->True,
+  Selectable->False]], "Output",
+ CellLabel->"Out[14]=",ExpressionUUID->"da44176f-06a7-48ff-a101-94e15957d90b"]
+}, Open  ]]
+}, Open  ]]
 }, Open  ]]
 },
-WindowSize->{958.1999999999999, 568.8},
-WindowMargins->{{Automatic, 90.60000000000014}, {Automatic, 0.6}},
+WindowSize->{1005, 991},
+WindowMargins->{{Automatic, 45}, {Automatic, 0}},
 TrackCellChangeTimes->False,
-FrontEndVersion->"13.0 for Microsoft Windows (64-bit) (February 4, 2022)",
+FrontEndVersion->"12.3 for Microsoft Windows (64-bit) (July 9, 2021)",
 StyleDefinitions->"ReverseColor.nb",
 ExpressionUUID->"1f3e5c21-f3cc-414a-86dc-62ac5770c605"
 ]
@@ -503,24 +607,51 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 254, 6, 68, "Code",ExpressionUUID->"5c0ac8d6-df1c-4ba2-ac00-8cf4ea0d4c28"],
+Cell[558, 20, 254, 6, 70, "Code",ExpressionUUID->"5c0ac8d6-df1c-4ba2-ac00-8cf4ea0d4c28"],
 Cell[CellGroupData[{
-Cell[837, 30, 245, 6, 50, "Code",ExpressionUUID->"912d0eca-dd69-4b79-93ee-72c5c96b8f7f"],
-Cell[1085, 38, 4901, 104, 79, "Output",ExpressionUUID->"e7aab3d0-21df-4028-8600-c43e2b46233e"]
+Cell[837, 30, 93, 0, 54, "Subsection",ExpressionUUID->"552299f6-a2b0-4af3-86bd-c32d2500e866"],
+Cell[CellGroupData[{
+Cell[955, 34, 245, 6, 51, "Code",ExpressionUUID->"912d0eca-dd69-4b79-93ee-72c5c96b8f7f"],
+Cell[1203, 42, 4901, 104, 79, "Output",ExpressionUUID->"938f8cd7-9b45-4331-bfe7-5a5da332ad06"]
+}, Open  ]],
+Cell[6119, 149, 82, 0, 38, "Text",ExpressionUUID->"4b41df89-a434-4129-ad0d-4c35b9d81fec"],
+Cell[6204, 151, 283, 7, 45, "Input",ExpressionUUID->"ef8ee62d-9476-473b-b39d-e15b3ce9e88b",
+ InitializationCell->True]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6023, 147, 283, 7, 59, "Input",ExpressionUUID->"ef8ee62d-9476-473b-b39d-e15b3ce9e88b",
+Cell[6524, 163, 93, 0, 54, "Subsection",ExpressionUUID->"eef9990d-5a5b-459e-ac55-d137b084a7aa"],
+Cell[CellGroupData[{
+Cell[6642, 167, 358, 9, 45, "Input",ExpressionUUID->"4a4bd7a6-eb0b-40a6-8cf7-052fefbbf0db",
  InitializationCell->True],
-Cell[6309, 156, 237, 5, 32, "Output",ExpressionUUID->"01e3e26b-0dec-4a4f-9aae-aba46c64a7d4"]
+Cell[7003, 178, 4861, 102, 79, "Output",ExpressionUUID->"45f0b79b-a943-4918-a787-2b924208a424"]
 }, Open  ]],
-Cell[6561, 164, 82, 0, 38, "Text",ExpressionUUID->"eef9990d-5a5b-459e-ac55-d137b084a7aa"],
+Cell[11879, 283, 82, 0, 38, "Text",ExpressionUUID->"85c73169-c761-4ff9-9d7a-5cb480fdc11e"],
+Cell[11964, 285, 283, 7, 45, "Input",ExpressionUUID->"e9a31737-3f4c-44bd-abbf-ed6fb4a683fc",
+ InitializationCell->True],
 Cell[CellGroupData[{
-Cell[6668, 168, 331, 8, 28, "Input",ExpressionUUID->"4a4bd7a6-eb0b-40a6-8cf7-052fefbbf0db"],
-Cell[7002, 178, 4861, 102, 79, "Output",ExpressionUUID->"84176242-44bb-4383-ad8a-0ce7993ed1f1"]
+Cell[12272, 296, 109, 0, 45, "Subsubsection",ExpressionUUID->"1ac66977-937e-47d1-b4a5-b23abae9766b"],
+Cell[CellGroupData[{
+Cell[12406, 300, 180, 3, 29, "Input",ExpressionUUID->"34a47fec-a020-40f1-a390-efec11b5a804"],
+Cell[12589, 305, 642, 16, 42, "Output",ExpressionUUID->"a76e066c-ad3e-49dc-808b-d590582f9bc9"]
+}, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[11900, 285, 7589, 153, 75, "Input",ExpressionUUID->"34a47fec-a020-40f1-a390-efec11b5a804"],
-Cell[19492, 440, 2447, 44, 74, "Output",ExpressionUUID->"921ef030-3506-43d7-b517-96a54220cfb0"]
+Cell[13280, 327, 96, 0, 45, "Subsubsection",ExpressionUUID->"1258a091-53f8-4b8f-819d-2c9f381d10f5"],
+Cell[13379, 329, 431, 11, 29, "Input",ExpressionUUID->"240366b8-c971-4a73-b621-a39b53b99e40"],
+Cell[13813, 342, 122, 0, 40, "Text",ExpressionUUID->"2969a1ed-58db-4934-b2fd-5415883ef2de"],
+Cell[13938, 344, 79, 0, 38, "Text",ExpressionUUID->"63708a68-128a-4759-88ae-e78781b7e2a7"],
+Cell[CellGroupData[{
+Cell[14042, 348, 420, 11, 29, "Input",ExpressionUUID->"50fa48ce-d466-4431-9fad-a199654733bd"],
+Cell[14465, 361, 4897, 104, 79, "Output",ExpressionUUID->"4770cc78-df85-4d38-834b-2f4879b9ec30"]
+}, Open  ]],
+Cell[19377, 468, 95, 0, 38, "Text",ExpressionUUID->"6c2ef0b7-aa7b-45d1-8f06-f796f1bef08c"],
+Cell[19475, 470, 196, 4, 29, "Input",ExpressionUUID->"35671d8f-e751-46f5-a58d-0ed17b5feabe"],
+Cell[19674, 476, 85, 0, 38, "Text",ExpressionUUID->"36205fee-916d-4a90-a5f3-019477af4416"],
+Cell[CellGroupData[{
+Cell[19784, 480, 156, 2, 29, "Input",ExpressionUUID->"60404616-3bcc-4523-971b-8180b7a343bb"],
+Cell[19943, 484, 4862, 102, 79, "Output",ExpressionUUID->"da44176f-06a7-48ff-a101-94e15957d90b"]
+}, Open  ]]
+}, Open  ]]
 }, Open  ]]
 }
 ]
