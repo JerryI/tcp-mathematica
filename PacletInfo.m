@@ -2,7 +2,7 @@ Paclet[
     Name -> "JTP",
     Version -> "0.1",
     MathematicaVersion -> "10+",
-    Description -> "SMS Gateway with Wolfram Mathematica",
+    Description -> "Implementation of the simple length:payload protocol over TCP for transfering large arbitary objects between two Mathematica Kernels or WF Engines. ",
     Creator -> "Kirill Vasin & Kirill Belov",
     Extensions -> 
         {

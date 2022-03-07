@@ -39,9 +39,6 @@ JTPClientSend::usage =
 "JTPClientSend[address, expr]"
 
 
-JTPClientRead::usage = 
-"JTPClientRead[address]"
-
 
 JTPClientEvaluate::usage = 
 "JTPClientEvaluate[address, expr]"
