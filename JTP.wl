@@ -73,9 +73,9 @@ getLength[data_ByteArray] :=
 First[ImportByteArray[data[[1 ;; 4]], "UnsignedInteger32"]]
 
 
-deserialize[buffer_DataStructure?(DataStructureQ[#, "RingBuffer"]&), length_Integer] := 
-Module[{data = buffer["PopBack"]}, 
-	While[Length[data] < length, data = Join[data, buffer["PopBack"]]]; 
+deserialize[buffer_, length_Integer] := 
+Module[{data = buffer["Pop"]}, 
+	While[Length[data] < length, data = Join[data, buffer["Pop"]];]; 
 	BinaryDeserialize[data]
 ]
 
@@ -84,7 +84,7 @@ Module[{data = buffer["PopBack"]},
 (*Evaluation*)
 
 
-evaluate[kernel_LinkObject, Hold[expr_]] := 
+evaluate[kernel_, Hold[expr_]] := 
 Module[{$expr = expr}, 
     With[{$def = Language`ExtendedFullDefinition[$expr]}, 
         If[LinkReadyQ[kernel], 
@@ -94,9 +94,19 @@ Module[{$expr = expr},
     ]
 ]
 
+evaluate[uuid_String, expr_] := 
+Block[{client = uuid},
+	Module[{$expr = expr//ReleaseHold}, 
+		Write[SocketObject[client], serialize[$expr]]; 
+		$expr
+	]
+]
 
-evaluate[func: _Symbol | _Function, Hold[expr_]] := 
-func[expr]
+SetAttributes[evaluate, HoldRest]
+
+
+(*evaluate[func: _Symbol | _Function, Hold[expr_]] := 
+func[expr]*)
 
 
 result[kernel_LinkObject] := 
@@ -122,9 +132,9 @@ Table[LinkLaunch["mathkernel -mathlink"], {n}]
 (*Logging*)
 
 
-writeLog[log_DataStructure?(DataStructureQ[#, "Queue"]&), message_String, args___] := 
+writeLog[log_, message_String, args___] := 
 Block[{$message = StringTemplate[message][args]}, 
-    log["Push", $message]; 
+    log["Append", $message]; 
     Print[$message]; 
     Return[$message]
 ]
@@ -156,35 +166,51 @@ SetAttributes[handler, HoldFirst]
 
 handler[server_Symbol?AssociationQ][assoc_?AssociationQ] := 
 Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray"]}, 
+	
+	writeLog[server[["log"]], "[<*Now*>] received (writelog)"];
 	set = Function[{key, value}, server["buffer", uuid, key] = value]; 
 	get = Function[key, server["buffer", uuid, key]]; 
 	If[Not[KeyExistsQ[server["buffer"], uuid]], 
 		server["buffer", uuid] = <|
-			"data" -> CreateDataStructure["RingBuffer", 256], 
+			"data" -> CreateDataStructure["Queue"], 
 			"status" -> "Empty", 
 			"length" -> 0, 
 			"currentLength" -> 0, 
 			"result" -> Null
 		|>; 
-		writeLog[server["log"], "Received "]
+		writeLog[server[["log"]], "[<*Now*>] New client"];
 	]; 
 	Which[
 		get["status"] == "Empty",
+			writeLog[server[["log"]], "[<*Now*>] Bucket is empty..."];
 			set["length", getLength[data]]; 
-			set["currentLength", Length[data[[4 ;; ]]]]; 
-			get["data"]["PopBack", data[[4 ;; 1]]]; 
+			writeLog[server[["log"]], StringTemplate["expected length: `` bytes"][getLength[data]]];
+			If[ (*prevent writting zero length element. otherwise it will become a normalised byte array*)
+				Length[data[[5 ;; ]]] > 0,
+			
+				set["currentLength", Length[data[[5 ;; ]]]]; 
+				get["data"]["Push", data[[5 ;; ]]]; 
+				
+			]; 
 			set["status", "Filling"]; , 
 			
 		get["status"] == "Filling", 
+			writeLog[server[["log"]], "[<*Now*>] Filling the bucket..."];
 			set["currentLength", get["currentLength"] + Length[data]]; 
-			get["data"]["PopBack", data]; 
+			get["data"]["Push", data]; 
 	]; 
-	Which[get["length"] == get["currentLength"],  
-		set["result", evalaute[selectKernel[server["kernels"]], get["data"]]]; 
-		set["status", "Ready"]; 
-		get["data"]["DropAll"]; 
-		set["length", 0]; 
-		set["currentLength", 0]; 
+	writeLog[server[["log"]], "[<*Now*>] `` length out of ``", get["currentLength"], get["length"] ];
+
+	Which[
+		get["length"] == get["currentLength"],  
+			writeLog[server[["log"]], "[<*Now*>] The length was matched"];
+			set["result", evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
+			writeLog[server[["log"]], "[<*Now*>] result is ``", get["result"] ];
+			set["status", "Empty"]; 
+			get["data"]["DropAll"]; 
+			set["length", 0]; 
+			set["currentLength", 0]; 
+
 		
 	]; 
 ]
@@ -198,7 +224,7 @@ SetAttributes[JTPServer, HoldFirst]
 
 
 Options[JTPServer] = {
-    "host" -> "localhost", 
+    "host" -> "127.0.0.1", 
     "port" -> 8000, 
     "kernels" -> {Evaluate}
 }
@@ -245,6 +271,8 @@ JTPServer /:
 JTPServerStart[JTPServer[server_Symbol?AssociationQ]] := (
 	server[[{"port", "socket"}]] = Values[openFreeSocket[server]]; 
 	server["listener"] = SocketListen[server["socket"], server["handler"]]; 
+	server["status"] = "started";
+	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPServer started"][]]; 
 	JTPServer[server]
 )
 
