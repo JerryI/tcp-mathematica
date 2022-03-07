@@ -68,5 +68,8 @@ And to reply to yourself using low-level functions on the server's side
 
 This part is still in development...
 
+### Multiple kernels
+This part is still in development...
+
 ## Development
 You can create the new paclet using `build.nb`. 
