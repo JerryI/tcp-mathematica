@@ -63,14 +63,37 @@ Module[{data, length},
     Join[length, data]
 ]
 
+getLength[buffer_] := 
+Module[{data = buffer["PopBack"]}, 
+	While[Length[data] < 4, data = Join[data, buffer["PopBack"]];]; 
+
+	With[{extra = Length[data] - 4},
+		If[extra > 0,
+			buffer["PushBack", Take[data, -extra]];
+			data = Drop[data, -extra];
+		];	
+	];
+
+	First[ImportByteArray[data, "UnsignedInteger32"]]
+]
 
 getLength[data_ByteArray] := 
 First[ImportByteArray[data[[1 ;; 4]], "UnsignedInteger32"]]
 
 
+
+
 deserialize[buffer_, length_Integer] := 
-Module[{data = buffer["Pop"]}, 
-	While[Length[data] < length, data = Join[data, buffer["Pop"]];]; 
+Module[{data = buffer["PopBack"]}, 
+	While[Length[data] < length, data = Join[data, buffer["PopBack"]];]; 
+
+	With[{extra = Length[data] - length},
+		If[extra > 0,
+			buffer["PushBack", Take[data, -extra]];
+			data = Drop[data, -extra];
+		];	
+	];
+
 	BinaryDeserialize[data]
 ]
 
@@ -128,7 +151,7 @@ Table[LinkLaunch["mathkernel -mathlink"], {n}]
 
 writeLog[log_, message_String, args___] := 
 Block[{$message = StringTemplate[message][args]}, 
-    log["Append", $message]; 
+    log["Push", $message]; 
      
     Return[$message]
 ]
@@ -169,6 +192,7 @@ connectSocket[#host, #port]& @ assoc
 
 
 SetAttributes[handler, HoldFirst]
+SetAttributes[decode, HoldFirst]
 
 
 handler[server_Symbol?AssociationQ][assoc_?AssociationQ] := 
@@ -179,7 +203,7 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 	get = Function[key, server["buffer", uuid, key]]; 
 	If[Not[KeyExistsQ[server["buffer"], uuid]], 
 		server["buffer", uuid] = <|
-			"data" -> CreateDataStructure["Queue"], 
+			"data" -> CreateDataStructure["Deque"], 
 			"status" -> "Empty", 
 			"length" -> 0, 
 			"promise" -> server[["promise"]],
@@ -197,7 +221,7 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 				Length[data[[5 ;; ]]] > 0,
 			
 				set["currentLength", Length[data[[5 ;; ]]]]; 
-				get["data"]["Push", data[[5 ;; ]]]; 
+				get["data"]["PushFront", data[[5 ;; ]]]; 
 				
 			]; 
 			set["status", "Filling"]; , 
@@ -205,24 +229,42 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 		get["status"] == "Filling", 
 			writeLog[server[["log"]], "[<*Now*>] Filling the bucket..."];
 			set["currentLength", get["currentLength"] + Length[data]]; 
-			get["data"]["Push", data]; 
+			get["data"]["PushFront", data]; 
 	]; 
 	writeLog[server[["log"]], "[<*Now*>] `` length out of ``", get["currentLength"], get["length"] ];
 
+	decode[server][uuid];
+]
+
+decode[server_Symbol?AssociationQ][uuid_] := 
+Module[{set, get},
+	set = Function[{key, value}, server["buffer", uuid, key] = value]; 
+	get = Function[key, server["buffer", uuid, key]];
+
 	Which[
-		get["length"] == get["currentLength"],  
+		get["length"] <= get["currentLength"],  
 			writeLog[server[["log"]], "[<*Now*>] The length was matched"];
 
 			server["promise"][uuid, evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
 
-			set["status", "Empty"]; 
-			get["data"]["DropAll"]; 
-			set["length", 0]; 
-			set["currentLength", 0]; 
-
-		
-	]; 
-]
+			If[get["data"]["EmptyQ"],
+				set["status", "Empty"]; 
+				set["length", 0]; 
+				set["currentLength", 0];	
+			,
+				set["status", "Filling"]; 
+				writeLog[server[["log"]], "[<*Now*>] Bucket is still not empty..."];
+				set["currentLength", get["currentLength"] - get["length"] - 4];
+				
+				set["length", getLength[get["data"]]]; 
+				writeLog[server[["log"]], StringTemplate["expected next length: `` bytes"][get["length"]]];
+				
+				(*go recursively*)
+				decode[server][uuid];
+			
+			];
+	];
+];
 
 
 (* ::Section:: *)
@@ -250,10 +292,10 @@ JTPServer[opts___?OptionQ] := With[{server = Unique["JTP`Objects`Server$"]},
 		"promise" -> reply,
 		"status" -> "Not started", 
 		"buffer" -> <||>, 
-		"log" -> CreateDataStructure["DynamicArray"], 
+		"log" -> CreateDataStructure["Queue"], 
 		"self" -> JTPServer[server]
 	|>; 
-	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPServer created"][]]; 
+	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPServer created"][]]; 
 	Return[JTPServer[server]]
 ]
 
@@ -282,12 +324,19 @@ JTPServerStart[JTPServer[server_Symbol?AssociationQ]] := (
 	server[[{"port", "socket"}]] = Values[openFreeSocket[server]]; 
 	server["listener"] = SocketListen[server["socket"], server["handler"]]; 
 	server["status"] = "listening..";
-	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPServer started listening"][]]; 
+	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPServer started listening"][]]; 
 	JTPServer[server]
 )
 
 JTPServer /: 
-JTPSend[uuid_, exp_] := (
+JTPServerDrop[JTPServer[server_Symbol?AssociationQ], uuid_] := (
+	server["buffer", uuid] = .;
+	Close[SocketObject[uuid]];
+ 
+	JTPServer[server]
+)
+
+JTPSend[uuid_, expr_] := (
 	BinaryWrite[SocketObject[uuid], serialize[Hold[expr]]]
 )
 
@@ -326,19 +375,10 @@ symbol[[ToString[key]]] = value
 (* ::Section:: *)
 (*Client*)
 
-
-SetAttributes[JTPClientEvaluate, HoldRest]
-
-SetAttributes[JTPClientEvaluateAsync, HoldRest]
-
-Options[JTPClientEvaluateAsync] = {
-    Promise -> Null
-}
-
 JTPClient /: 
 JTPClientEvaluate[JTPClient[server_Symbol?AssociationQ], expr_] :=
 Module[{raw, length}, 
-	BinaryWrite[server["socket"], serialize[expr]]; 
+	BinaryWrite[server["socket"], serialize[Hold[expr]]]; 
 	raw = SocketReadMessage[server["socket"]];
 	length = getLength[Take[raw, 4]];
 	raw = Drop[raw, 4];
@@ -355,12 +395,12 @@ Module[{},
 	];
 	
 	server["status"] = "temporary listening";
-	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient temporary listening"][]];
+	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient temporary listening"][]];
 
-	BinaryWrite[server["socket"], serialize[expr]]; 
+	BinaryWrite[server["socket"], serialize[Hold[expr]]]; 
 ]
 
-SetAttributes[JTPClientSend, HoldRest]
+
 
 JTPClient /: 
 JTPClientSend[JTPClient[server_Symbol?AssociationQ], expr_] :=
@@ -368,6 +408,18 @@ JTPClientSend[JTPClient[server_Symbol?AssociationQ], expr_] :=
 
 
 SetAttributes[JTPClient, HoldFirst]
+
+SetAttributes[JTPClientSend, HoldRest]
+
+SetAttributes[JTPClientEvaluate, HoldRest]
+
+SetAttributes[JTPClientEvaluateAsync, HoldRest]
+
+
+
+Options[JTPClientEvaluateAsync] = {
+    Promise -> Null
+}
 
 
 Options[JTPClient] = {
@@ -388,10 +440,10 @@ JTPClient[opts___?OptionQ] := With[{client = Unique["JTP`Objects`Client$"]},
 		"promise" -> Null,
 		"status" -> "Not connected", 
 		"buffer" -> <||>, 
-		"log" -> CreateDataStructure["DynamicArray"], 
+		"log" -> CreateDataStructure["Queue"], 
 		"self" -> JTPClient[client]
 	|>; 
-	client[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient created"][]]; 
+	client[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient created"][]]; 
 	Return[JTPClient[client]]
 ]
 
@@ -419,7 +471,7 @@ JTPClient /:
 JTPClientStart[JTPClient[server_Symbol?AssociationQ]] := (
 	server[[{"port", "socket"}]] = Values[connectSocket[server]]; 
 	server["status"] = "started";
-	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient started"][]]; 
+	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient started"][]]; 
 	JTPClient[server]
 )
 
@@ -429,7 +481,7 @@ JTPClientStartListening[JTPClient[server_Symbol?AssociationQ], opts___?OptionQ] 
 	server["listener"] = SocketListen[server["socket"], server["handler"]];
 	server["promise"] = OptionValue[JTPClientStartListening, Flatten[{opts}], Promise];
 	server["status"] = "listening";
-	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient listening"][]]; 
+	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient listening"][]]; 
 	JTPClient[server]
 )
 
@@ -441,7 +493,18 @@ JTPClient /:
 JTPClientStopListening[JTPClient[server_Symbol?AssociationQ]] := (
 	server["listener"] = DeleteObject[server["listener"]];
 	server["status"] = "started";
-	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient has stopped listening"][]]; 
+	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient has stopped listening"][]]; 
+	JTPClient[server]
+)
+
+
+JTPClient /: 
+JTPClientStop[JTPClient[server_Symbol?AssociationQ]] := (
+	server["listener"] = DeleteObject[server["listener"]];
+	server["status"] = "terminated";
+	If[SocketReadyQ[server["socket"]], SocketReadMessage[server["socket"]]];
+	Close[server["socket"]];
+	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient was terminated"][]]; 
 	JTPClient[server]
 )
  

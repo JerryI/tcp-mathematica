@@ -68,6 +68,11 @@ And to reply to yourself using low-level functions on the server's side
 
 This part is still in development...
 
+### Send messages to the particular client from server
+For this reason you need to obtain uuid of the socket first
+
+    JTPSend[uuid, expr]
+
 ### Multiple kernels
 This part is still in development...
 
