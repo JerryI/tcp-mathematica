@@ -94,13 +94,13 @@ Module[{$expr = expr},
     ]
 ]
 
-evaluate[uuid_String, expr_] := 
+evaluate[expr_] := 
 Block[{client = uuid},
-	Module[{$expr = expr//ReleaseHold}, 
-		Write[SocketObject[client], serialize[$expr]]; 
-		$expr
-	]
+	expr//ReleaseHold
 ]
+
+reply[uuid_String, expr_] := 
+BinaryWrite[SocketObject[uuid], serialize[expr]]
 
 SetAttributes[evaluate, HoldRest]
 
@@ -157,6 +157,19 @@ openFreeSocket[assoc_?AssociationQ] :=
 openFreeSocket[#host, #port]& @ assoc
 
 
+
+
+
+connectSocket[host_String, port_Integer] := 
+Block[{$port = port, $socket = SocketConnect[{host, port}, "TCP"]}, 
+    Return[<|"port" -> $port, "socket"  -> $socket|>]
+]
+
+
+connectSocket[assoc_?AssociationQ] := 
+connectSocket[#host, #port]& @ assoc
+
+
 (* ::Section:: *)
 (*Handler*)
 
@@ -175,6 +188,7 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 			"data" -> CreateDataStructure["Queue"], 
 			"status" -> "Empty", 
 			"length" -> 0, 
+			"promise" -> server[["promise"]],
 			"currentLength" -> 0, 
 			"result" -> Null
 		|>; 
@@ -204,8 +218,9 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 	Which[
 		get["length"] == get["currentLength"],  
 			writeLog[server[["log"]], "[<*Now*>] The length was matched"];
-			set["result", evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
-			writeLog[server[["log"]], "[<*Now*>] result is ``", get["result"] ];
+
+			get["promise"][uuid, evaluate[deserialize@@{get["data"], get["length"]}]]; 
+
 			set["status", "Empty"]; 
 			get["data"]["DropAll"]; 
 			set["length", 0]; 
@@ -238,6 +253,7 @@ JTPServer[opts___?OptionQ] := With[{server = Unique["JTP`Objects`Server$"]},
 		"socket" -> Automatic, 
 		"handler" -> handler[server], 
 		"listener" -> Automatic, 
+		"promise" -> reply,
 		"status" -> "Not started", 
 		"buffer" -> <||>, 
 		"log" -> CreateDataStructure["DynamicArray"], 
@@ -271,8 +287,8 @@ JTPServer /:
 JTPServerStart[JTPServer[server_Symbol?AssociationQ]] := (
 	server[[{"port", "socket"}]] = Values[openFreeSocket[server]]; 
 	server["listener"] = SocketListen[server["socket"], server["handler"]]; 
-	server["status"] = "started";
-	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPServer started"][]]; 
+	server["status"] = "listening..";
+	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPServer started listening"][]]; 
 	JTPServer[server]
 )
 
@@ -312,12 +328,126 @@ symbol[[ToString[key]]] = value
 
 SetAttributes[JTPClientEvaluate, HoldRest]
 
+SetAttributes[JTPClientSend, HoldRest]
 
-JTPClientEvaluate[{host_String, port_Integer}, expr_] := 
-Module[{socket = SocketConnect[{host, port}, "TCP"]}, 
-	Write[socket, serialize[expr]]; 
-	SocketReadMessage[socket]; 
+JTPClient /: 
+JTPClientEvaluate[JTPClient[server_Symbol?AssociationQ], expr_] :=
+Module[{raw, length}, 
+	BinaryWrite[server["socket"], serialize[expr]]; 
+	raw = SocketReadMessage[server["socket"]];
+	length = getLength[Take[raw, 4]];
+	raw = Drop[raw, 4];
+	While[Length[raw] < length, raw = Join[raw, SocketReadMessage[server["socket"]]]];
+	raw // BinaryDeserialize
 ]
+
+JTPClient /: 
+JTPClientSend[JTPClient[server_Symbol?AssociationQ], expr_] :=
+	reply[server["socket"][[1]], Hold[expr]]
+
+
+SetAttributes[JTPClient, HoldFirst]
+
+
+Options[JTPClient] = {
+    "host" -> "127.0.0.1", 
+    "port" -> 8000, 
+    "kernels" -> {Evaluate}
+}
+
+
+JTPClient[opts___?OptionQ] := With[{client = Unique["JTP`Objects`Client$"]}, 
+    client = <|
+		"host" -> OptionValue[JTPClient, Flatten[{opts}], "host"], 
+		"port" -> OptionValue[JTPClient, Flatten[{opts}], "port"], 
+		"kernels" -> OptionValue[JTPClient, Flatten[{opts}], "kernels"], 
+		"socket" -> Automatic, 
+		"handler" -> handler[client], 
+		"listener" -> Automatic, 
+		"promise" -> Null,
+		"status" -> "Not connected", 
+		"buffer" -> <||>, 
+		"log" -> CreateDataStructure["DynamicArray"], 
+		"self" -> JTPClient[client]
+	|>; 
+	client[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient created"][]]; 
+	Return[JTPClient[client]]
+]
+
+
+JTPClient /: 
+MakeBoxes[obj: JTPClient[server_Symbol?AssociationQ], form_] := (
+	BoxForm`ArrangeSummaryBox[
+		JTPClient, 
+		obj, 
+		Null, 
+		{
+			{BoxForm`SummaryItem[{"port: ", server[["port"]]}], SpanFromLeft}, 
+			{BoxForm`SummaryItem[{"host: ", server[["host"]]}], SpanFromLeft}, 
+			{BoxForm`SummaryItem[{"status: ", server[["status"]]}], SpanFromLeft}
+		}, {
+			{BoxForm`SummaryItem[{"kernels: ", server[["kernels"]]}], SpanFromLeft}, 
+			{BoxForm`SummaryItem[{"self: ", server[["self"]]}] /. JTPClient -> Defer, SpanFromLeft}
+		}, 
+		form
+	]
+)
+
+
+JTPClient /: 
+JTPClientStart[JTPClient[server_Symbol?AssociationQ]] := (
+	server[[{"port", "socket"}]] = Values[connectSocket[server]]; 
+	server["status"] = "started";
+	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient started"][]]; 
+	JTPClient[server]
+)
+
+
+JTPClient /: 
+JTPClientStartListening[JTPClient[server_Symbol?AssociationQ]] := (
+	server["listener"] = SocketListen[server["socket"], server["handler"]];
+	server["status"] = "listening";
+	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient listening"][]]; 
+	JTPClient[server]
+)
+
+JTPClient /: 
+JTPClientStopListening[JTPClient[server_Symbol?AssociationQ]] := (
+	server["listener"] = DeleteObject[server["listener"]];
+	server["status"] = "started";
+	server[["log"]]["Append", StringTemplate["[<*Now*>] JTPClient has stopped listening"][]]; 
+	JTPClient[server]
+)
+ 
+
+
+JTPClient[server_Symbol?AssociationQ][keys__String] := 
+server[keys]
+
+
+JTPClient[server_Symbol?AssociationQ][keys_Symbol] := 
+server[ToString[keys]]
+
+
+JTPClient[server_Symbol?AssociationQ][key_Symbol] := 
+server[ToString[key]]
+
+
+JTPClient /: 
+Set[name_Symbol, server_JTPClient] := (
+	name /: Set[name[key: _String | _Symbol], value_] := With[{$server = server}, $server[key] = value];
+	Block[{JTPClient}, SetAttributes[JTPClient, HoldFirst]; name = server]
+)
+
+
+JTPClient /: 
+Set[JTPClient[symbol_Symbol?AssociationQ][key_String], value_] := 
+symbol[[key]] = value
+
+
+JTPClient /: 
+Set[JTPClient[symbol_Symbol?AssociationQ][key_Symbol], value_] := 
+symbol[[ToString[key]]] = value
 
 
 (* ::Section:: *)
