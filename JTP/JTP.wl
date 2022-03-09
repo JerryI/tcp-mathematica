@@ -35,25 +35,56 @@ JTPServerStop::usage =
 "JTPServerStop[server]"
 
 
-JTPClientSend::usage = 
-"JTPClientSend[address, expr]"
+JTPServerDrop::usage = 
+"JTPServerDrop[server]"
 
+
+JTPClient::usage = 
+"JTPClient[]
+JTPClient[opts]"
+
+
+JTPClientSend::usage = 
+"JTPClientSend[client, expr]"
+
+
+JTPClientStart::usage = 
+"JTPClientStart[client]"
+
+
+JTPClientStop::usage = 
+"JTPClientStop[client]"
 
 
 JTPClientEvaluate::usage = 
-"JTPClientEvaluate[address, expr]"
+"JTPClientEvaluate[client, expr]"
+
+
+JTPClientEvaluateAsync::usage = 
+"JTPClientEvaluateAsync[client, expr]"
+
+
+JTPClientStopListening::usage = 
+"JTPClientStopListening[client]"
+
+
+JTPClientStartListening::usage = 
+"JTPClientStartListening[client]"
+
+
+JTPSend::usage = 
+"JTPSend[uuid, expr]"
 
 
 (* ::Section:: *)
 (*Begin private*)
 
 
-(*Begin["`Private`"]*)
+Begin["`Private`"]
 
 
 (* ::Section:: *)
 (*Serialization*)
-
 
 
 serialize[expr_] := 
@@ -63,7 +94,8 @@ Module[{data, length},
     Join[length, data]
 ]
 
-getLength[buffer_] := 
+
+getLength[buffer_DataStructure] := 
 Module[{data = buffer["PopBack"]}, 
 	While[Length[data] < 4, data = Join[data, buffer["PopBack"]];]; 
 
@@ -77,10 +109,9 @@ Module[{data = buffer["PopBack"]},
 	First[ImportByteArray[data, "UnsignedInteger32"]]
 ]
 
+
 getLength[data_ByteArray] := 
 First[ImportByteArray[data[[1 ;; 4]], "UnsignedInteger32"]]
-
-
 
 
 deserialize[buffer_, length_Integer] := 
@@ -101,29 +132,31 @@ Module[{data = buffer["PopBack"]},
 (* ::Section:: *)
 (*Evaluation*)
 
-(*
-evaluate[kernel_, Hold[expr_]] := 
-Module[{$expr = expr}, 
+
+evaluate[kernel_LinkObject, Hold[expr_]] := 
+Module[{$expr = Hold[expr]}, 
     With[{$def = Language`ExtendedFullDefinition[$expr]}, 
         If[LinkReadyQ[kernel], 
             LinkWrite[kernel, Unevaluated[Language`ExtendedFullDefinition[] = $def; expr]], 
             Missing[StringTemplate["Kernel [``] not ready"][kernel]]
         ]
     ]
-]*)
+]
 
-evaluate[uuid_, expr_] := 
+
+evaluate[uuid_String, expr_] := 
 (*virtual env*)
 Block[{socket = uuid},
 	ReleaseHold[expr]
 ]
 
+
 reply[uuid_String, expr_] := 
 BinaryWrite[SocketObject[uuid], serialize[expr]]
 
 
-(*evaluate[func: _Symbol | _Function, Hold[expr_]] := 
-func[expr]*)
+evaluate[func: _Symbol | _Function, Hold[expr_]] := 
+func[expr]
 
 
 result[kernel_LinkObject] := 
@@ -328,19 +361,22 @@ JTPServerStart[JTPServer[server_Symbol?AssociationQ]] := (
 	JTPServer[server]
 )
 
+
 JTPServer /: 
 JTPServerDrop[JTPServer[server_Symbol?AssociationQ], uuid_] := (
-	server["buffer", uuid] = .;
+	Unset[server["buffer", uuid]];
 	Close[SocketObject[uuid]];
  
 	JTPServer[server]
 )
 
+
+SetAttributes[JTPSend, HoldRest]
+
+
 JTPSend[uuid_, expr_] := (
 	BinaryWrite[SocketObject[uuid], serialize[Hold[expr]]]
 )
-
-SetAttributes[JTPSend, HoldRest]
 
 
 JTPServer[server_Symbol?AssociationQ][keys__String] := 
@@ -375,6 +411,7 @@ symbol[[ToString[key]]] = value
 (* ::Section:: *)
 (*Client*)
 
+
 JTPClient /: 
 JTPClientEvaluate[JTPClient[server_Symbol?AssociationQ], expr_] :=
 Module[{raw, length}, 
@@ -404,21 +441,23 @@ Module[{},
 
 JTPClient /: 
 JTPClientSend[JTPClient[server_Symbol?AssociationQ], expr_] :=
-	reply[server["socket"][[1]], Hold[expr]]
+reply[server["socket"][[1]], Hold[expr]]
 
 
 SetAttributes[JTPClient, HoldFirst]
 
+
 SetAttributes[JTPClientSend, HoldRest]
 
+
 SetAttributes[JTPClientEvaluate, HoldRest]
+
 
 SetAttributes[JTPClientEvaluateAsync, HoldRest]
 
 
-
 Options[JTPClientEvaluateAsync] = {
-    Promise -> Null
+    "Promise" -> Null
 }
 
 
@@ -485,9 +524,11 @@ JTPClientStartListening[JTPClient[server_Symbol?AssociationQ], opts___?OptionQ] 
 	JTPClient[server]
 )
 
+
 Options[JTPClientStartListening] = {
     Promise -> Null
 }
+
 
 JTPClient /: 
 JTPClientStopListening[JTPClient[server_Symbol?AssociationQ]] := (
@@ -543,7 +584,7 @@ symbol[[ToString[key]]] = value
 (*End private*)
 
 
-(*End[]*) (*`Private`*)
+End[] (*`Private`*)
 
 
 (* ::Section:: *)
