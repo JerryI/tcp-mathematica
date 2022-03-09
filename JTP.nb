@@ -10,16 +10,14 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[      9491,        250]
-NotebookOptionsPosition[      9005,        233]
-NotebookOutlinePosition[      9410,        249]
-CellTagsIndexPosition[      9367,        246]
+NotebookDataLength[      1384,         48]
+NotebookOptionsPosition[      1000,         33]
+NotebookOutlinePosition[      1433,         50]
+CellTagsIndexPosition[      1390,         47]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
 Notebook[{
-
-Cell[CellGroupData[{
 Cell[BoxData[{
  RowBox[{
   RowBox[{"ClearAll", "[", "\"\<`*\>\"", "]"}], ";"}], "\n", 
@@ -30,209 +28,12 @@ Cell[BoxData[{
   RowBox[{"SetDirectory", "[", 
    RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ";"}], "\n", 
  RowBox[{"<<", "JTP`"}], "\n", 
- RowBox[{"Information", "[", "\"\<JTP`*\>\"", "]"}]}], "Code",
- CellChangeTimes->{{3.8558001900307856`*^9, 3.85580021054412*^9}, {
-  3.855800554891427*^9, 
-  3.8558005627922397`*^9}},ExpressionUUID->"1b80dc1a-fcab-4fe2-9edf-\
-239994dd0c07"],
-
-Cell[BoxData[
- StyleBox[
-  FrameBox[GridBox[{
-     {
-      DynamicModuleBox[{Typeset`open$$ = True}, 
-       PaneSelectorBox[{False->
-        ButtonBox[
-         RowBox[{
-          
-          DynamicBox[FEPrivate`FrontEndResource[
-           "FEBitmaps", "RightPointerOpener"]], " ", 
-          StyleBox["JTP`", "InformationGridGroupHeader"]}],
-         Appearance->None,
-         BaseStyle->"InformationGridLink",
-         ButtonFunction:>FEPrivate`Set[Typeset`open$$, True],
-         Evaluator->Automatic,
-         Method->"Preemptive"], True->
-        PaneBox[GridBox[{
-           {
-            ButtonBox[
-             RowBox[{
-              
-              DynamicBox[FEPrivate`FrontEndResource[
-               "FEBitmaps", "DownPointerOpener"],
-               ImageSizeCache->{10., {3., 7.}}], " ", 
-              StyleBox["JTP`", "InformationGridGroupHeader"]}],
-             Appearance->None,
-             BaseStyle->"InformationGridLink",
-             ButtonFunction:>FEPrivate`Set[Typeset`open$$, False],
-             Evaluator->Automatic,
-             Method->"Preemptive"]},
-           {
-            PaneBox[GridBox[{
-               {
-                ButtonBox[
-                 StyleBox["JTPClient", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClient", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPClientStart", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClientStart", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPSend", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPSend", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPServerStop", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPServerStop", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic]},
-               {
-                ButtonBox[
-                 StyleBox["JTPClientEvaluate", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClientEvaluate", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPClientStartListening", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClientStartListening", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPServer", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPServer", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], ""},
-               {
-                ButtonBox[
-                 StyleBox["JTPClientEvaluateAsync", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClientEvaluateAsync", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPClientStop", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClientStop", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPServerDrop", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPServerDrop", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], ""},
-               {
-                ButtonBox[
-                 StyleBox["JTPClientSend", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClientSend", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPClientStopListening", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPClientStopListening", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], 
-                ButtonBox[
-                 StyleBox["JTPServerStart", "InformationGridButton"],
-                 Appearance->None,
-                 BaseStyle->"InformationGridLink",
-                 
-                 ButtonData:>{
-                  "Info-05948f4c-7a78-40a6-8296-1ca9a57839a7", {
-                   "JTPServerStart", "JTP`"}, True},
-                 ButtonNote->"JTP`",
-                 Evaluator->Automatic], ""}
-              },
-              DefaultBaseStyle->"Text",
-              
-              GridBoxAlignment->{
-               "Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
-              GridBoxItemSize->{"Columns" -> {{
-                   Scaled[0.2375]}}}],
-             ImageMargins->{{10, 0}, {0, 2}}]}
-          },
-          GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}}],
-         FrameMargins->{{0, 0}, {8, 0}}]}, Dynamic[Typeset`open$$],
-        ImageSize->Automatic]]}
-    },
-    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
-    GridBoxDividers->{"ColumnsIndexed" -> {{False}}, "RowsIndexed" -> {}},
-    GridBoxSpacings->{"Columns" -> {
-        Offset[0.27999999999999997`], {
-         Offset[0.5599999999999999]}, 
-        Offset[0.27999999999999997`]}, "Rows" -> {
-        Offset[0.2], {
-         Offset[0.8]}, 
-        Offset[0.2]}}],
-   BaseStyle->"InformationTitleFrame"], "InformationGridPlain"]], "Output",
- CellChangeTimes->{
-  3.855800563125473*^9},ExpressionUUID->"3281f5da-9950-44b6-89d0-\
-9b3b08e87029"]
-}, Open  ]]
+ RowBox[{"Information", "[", "\"\<JTP`*\>\"", "]"}]}], "Code",ExpressionUUID->\
+"1b80dc1a-fcab-4fe2-9edf-239994dd0c07"]
 },
-WindowSize->{958, 988},
-WindowMargins->{{-7, Automatic}, {Automatic, 0}},
+WindowSize->{958, 981},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+TrackCellChangeTimes->False,
 FrontEndVersion->"13.0 for Microsoft Windows (64-bit) (December 2, 2021)",
 StyleDefinitions->"ReverseColor.nb",
 ExpressionUUID->"fd46bc0b-4708-415c-8d42-5f74ad0e3e59"
@@ -248,10 +49,7 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[CellGroupData[{
-Cell[580, 22, 559, 14, 124, "Code",ExpressionUUID->"1b80dc1a-fcab-4fe2-9edf-239994dd0c07"],
-Cell[1142, 38, 7847, 192, 173, "Output",ExpressionUUID->"3281f5da-9950-44b6-89d0-9b3b08e87029"]
-}, Open  ]]
+Cell[558, 20, 438, 11, 124, "Code",ExpressionUUID->"1b80dc1a-fcab-4fe2-9edf-239994dd0c07"]
 }
 ]
 *)
