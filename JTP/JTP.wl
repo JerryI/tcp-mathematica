@@ -182,11 +182,14 @@ Table[LinkLaunch["mathkernel -mathlink"], {n}]
 (*Logging*)
 
 
-writeLog[log_, message_String, args___] := 
-Block[{$message = StringTemplate[message][args]}, 
-    log["Push", $message]; 
+writeLog[server_Symbol?AssociationQ, message_String, args___] := 
+If[!server["nohup"],
+	Block[{$message = StringTemplate[message][args]}, 
+    	server["log"]["Push", $message]; 
      
-    Return[$message]
+    	Return[$message]
+	],
+	"nohup"
 ]
 
 
@@ -231,7 +234,7 @@ SetAttributes[decode, HoldFirst]
 handler[server_Symbol?AssociationQ][assoc_?AssociationQ] := 
 Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray"]}, 
 	
-	writeLog[server[["log"]], "[<*Now*>] received (writelog)"];
+	writeLog[server, "[<*Now*>] received"];
 	set = Function[{key, value}, server["buffer", uuid, key] = value]; 
 	get = Function[key, server["buffer", uuid, key]]; 
 	If[Not[KeyExistsQ[server["buffer"], uuid]], 
@@ -243,13 +246,13 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 			"currentLength" -> 0, 
 			"result" -> Null
 		|>; 
-		writeLog[server[["log"]], "[<*Now*>] New client"];
+		writeLog[server, "[<*Now*>] New client"];
 	]; 
 	Which[
 		get["status"] == "Empty",
-			writeLog[server[["log"]], "[<*Now*>] Bucket is empty..."];
+			writeLog[server, "[<*Now*>] Bucket is empty..."];
 			set["length", getLength[data]]; 
-			writeLog[server[["log"]], StringTemplate["expected length: `` bytes"][getLength[data]]];
+			writeLog[server, "expected length: `` bytes", getLength[data]];
 			If[ (*prevent writting zero length element. otherwise it will become a normalised byte array*)
 				Length[data[[5 ;; ]]] > 0,
 			
@@ -260,11 +263,11 @@ Module[{set, get, uuid = assoc["SourceSocket"][[1]], data = assoc["DataByteArray
 			set["status", "Filling"]; , 
 			
 		get["status"] == "Filling", 
-			writeLog[server[["log"]], "[<*Now*>] Filling the bucket..."];
+			writeLog[server, "[<*Now*>] Filling the bucket..."];
 			set["currentLength", get["currentLength"] + Length[data]]; 
 			get["data"]["PushFront", data]; 
 	]; 
-	writeLog[server[["log"]], "[<*Now*>] `` length out of ``", get["currentLength"], get["length"] ];
+	writeLog[server, "[<*Now*>] `` length out of ``", get["currentLength"], get["length"] ];
 
 	decode[server][uuid];
 ]
@@ -276,7 +279,7 @@ Module[{set, get},
 
 	Which[
 		get["length"] <= get["currentLength"],  
-			writeLog[server[["log"]], "[<*Now*>] The length was matched"];
+			writeLog[server, "[<*Now*>] The length was matched"];
 
 			server["promise"][uuid, evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
 
@@ -286,11 +289,11 @@ Module[{set, get},
 				set["currentLength", 0];	
 			,
 				set["status", "Filling"]; 
-				writeLog[server[["log"]], "[<*Now*>] Bucket is still not empty..."];
+				writeLog[server, "[<*Now*>] Bucket is still not empty..."];
 				set["currentLength", get["currentLength"] - get["length"] - 4];
 				
 				set["length", getLength[get["data"]]]; 
-				writeLog[server[["log"]], StringTemplate["expected next length: `` bytes"][get["length"]]];
+				writeLog[server, "expected next length: `` bytes", get["length"]];
 				
 				(*go recursively*)
 				decode[server][uuid];
@@ -310,7 +313,8 @@ SetAttributes[JTPServer, HoldFirst]
 Options[JTPServer] = {
     "host" -> "127.0.0.1", 
     "port" -> 8000, 
-    "kernels" -> {Evaluate}
+    "kernels" -> {Evaluate},
+	"nohup" -> False
 }
 
 
@@ -326,9 +330,10 @@ JTPServer[opts___?OptionQ] := With[{server = Unique["JTP`Objects`Server$"]},
 		"status" -> "Not started", 
 		"buffer" -> <||>, 
 		"log" -> CreateDataStructure["Queue"], 
+		"nohup" -> OptionValue[JTPServer, Flatten[{opts}], "nohup"],
 		"self" -> JTPServer[server]
 	|>; 
-	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPServer created"][]]; 
+	writeLog[server, "[<*Now*>] JTPServer created"]; 
 	Return[JTPServer[server]]
 ]
 
@@ -357,7 +362,7 @@ JTPServerStart[JTPServer[server_Symbol?AssociationQ]] := (
 	server[[{"port", "socket"}]] = Values[openFreeSocket[server]]; 
 	server["listener"] = SocketListen[server["socket"], server["handler"]]; 
 	server["status"] = "listening..";
-	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPServer started listening"][]]; 
+	writeLog[server, "[<*Now*>] JTPServer started listening"]; 
 	JTPServer[server]
 )
 
@@ -432,7 +437,7 @@ Module[{},
 	];
 	
 	server["status"] = "temporary listening";
-	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient temporary listening"][]];
+	writeLog[server, "[<*Now*>] JTPClient temporary listening"];
 
 	BinaryWrite[server["socket"], serialize[Hold[expr]]]; 
 ]
@@ -464,7 +469,8 @@ Options[JTPClientEvaluateAsync] = {
 Options[JTPClient] = {
     "host" -> "127.0.0.1", 
     "port" -> 8000, 
-    "kernels" -> {Evaluate}
+    "kernels" -> {Evaluate},
+	"nohup" -> False
 }
 
 
@@ -480,9 +486,10 @@ JTPClient[opts___?OptionQ] := With[{client = Unique["JTP`Objects`Client$"]},
 		"status" -> "Not connected", 
 		"buffer" -> <||>, 
 		"log" -> CreateDataStructure["Queue"], 
+		"nohup" -> OptionValue[JTPClient, Flatten[{opts}], "nohup"],
 		"self" -> JTPClient[client]
 	|>; 
-	client[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient created"][]]; 
+	writeLog[client, "[<*Now*>] JTPClient created"]; 
 	Return[JTPClient[client]]
 ]
 
@@ -510,7 +517,7 @@ JTPClient /:
 JTPClientStart[JTPClient[server_Symbol?AssociationQ]] := (
 	server[[{"port", "socket"}]] = Values[connectSocket[server]]; 
 	server["status"] = "started";
-	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient started"][]]; 
+	writeLog[server, "[<*Now*>] JTPClient started"]; 
 	JTPClient[server]
 )
 
@@ -520,7 +527,7 @@ JTPClientStartListening[JTPClient[server_Symbol?AssociationQ], opts___?OptionQ] 
 	server["listener"] = SocketListen[server["socket"], server["handler"]];
 	server["promise"] = OptionValue[JTPClientStartListening, Flatten[{opts}], Promise];
 	server["status"] = "listening";
-	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient listening"][]]; 
+	writeLog[server, "[<*Now*>] JTPClient listening"]; 
 	JTPClient[server]
 )
 
@@ -534,7 +541,7 @@ JTPClient /:
 JTPClientStopListening[JTPClient[server_Symbol?AssociationQ]] := (
 	server["listener"] = DeleteObject[server["listener"]];
 	server["status"] = "started";
-	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient has stopped listening"][]]; 
+	writeLog[server, "[<*Now*>] JTPClient has stopped listening"]; 
 	JTPClient[server]
 )
 
@@ -545,7 +552,7 @@ JTPClientStop[JTPClient[server_Symbol?AssociationQ]] := (
 	server["status"] = "terminated";
 	If[SocketReadyQ[server["socket"]], SocketReadMessage[server["socket"]]];
 	Close[server["socket"]];
-	server[["log"]]["Push", StringTemplate["[<*Now*>] JTPClient was terminated"][]]; 
+	writeLog[server, "[<*Now*>] JTPClient was terminated"]; 
 	JTPClient[server]
 )
  
