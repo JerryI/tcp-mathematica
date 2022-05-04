@@ -154,10 +154,10 @@ Module[{$expr = Hold[expr]},
 reply[uuid_String, expr_] := 
 BinaryWrite[SocketObject[uuid], serialize[expr]]
 
-
+(*
 evaluate[func: _Symbol | _Function, Hold[expr_]] := 
 func[expr]
-
+*)
 
 result[kernel_LinkObject] := 
 If[LinkReadyQ[kernel], 
@@ -280,7 +280,8 @@ Module[{set, get},
 	Which[
 		get["length"] <= get["currentLength"],  
 			writeLog[server, "[<*Now*>] The length was matched"];
-	
+			
+			logWrite["evaluate from UUID: "<>uuid];
 			server["promise"][uuid, evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
 
 			If[get["data"]["EmptyQ"],
