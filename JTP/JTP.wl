@@ -79,6 +79,12 @@ JTPSend::usage =
 (* ::Section:: *)
 (*Begin private*)
 
+evaluate[uuid_String, expr_] := 
+(*virtual env*)
+Block[{socket = uuid},
+	ReleaseHold[expr]
+]
+
 
 Begin["`Private`"]
 
@@ -142,10 +148,6 @@ Module[{$expr = Hold[expr]},
         ]
     ]
 ]
-
-
-evaluate[uuid_String, expr_] := 
-ReleaseHold[expr]
 
 
 
@@ -278,10 +280,8 @@ Module[{set, get},
 	Which[
 		get["length"] <= get["currentLength"],  
 			writeLog[server, "[<*Now*>] The length was matched"];
-
-			Block[{socket = uuid},
-				server["promise"][uuid, evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
-			]
+	
+			server["promise"][uuid, evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
 
 			If[get["data"]["EmptyQ"],
 				set["status", "Empty"]; 
