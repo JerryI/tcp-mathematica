@@ -190,9 +190,7 @@ Table[LinkLaunch["mathkernel -mathlink"], {n}]
 writeLog[server_Symbol?AssociationQ, message_String, args___] := 
 If[True,
 	Block[{$message = StringTemplate[message][args]}, 
-    	server["log"]["Push", $message]; 
-     
-    	Print[$message]
+    	server["log"] = {server["log"], $message}; 
 	],
 	"nohup"
 ]
