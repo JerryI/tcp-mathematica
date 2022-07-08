@@ -81,7 +81,7 @@ JTPSend::usage =
 
 evaluate[uuid_String, expr_] := 
 (*virtual env*)
-Block[{socket = uuid},
+Block[{jsocket = uuid},
 	ReleaseHold[expr]
 ]
 
