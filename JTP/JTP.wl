@@ -85,6 +85,18 @@ Block[{socket = uuid},
 	ReleaseHold[expr]
 ]
 
+serialize[expr_] := 
+Module[{data, length}, 
+    data = BinarySerialize[expr]; 
+    length = ExportByteArray[Length[data], "UnsignedInteger32"]; 
+    Join[length, data]
+]
+
+JTPSend[uuid_, expr_] := (
+	BinaryWrite[SocketObject[uuid], serialize[Hold[expr]]]
+)
+
+SetAttributes[JTPSend, HoldRest]
 
 Begin["`Private`"]
 
@@ -93,12 +105,7 @@ Begin["`Private`"]
 (*Serialization*)
 
 
-serialize[expr_] := 
-Module[{data, length}, 
-    data = BinarySerialize[expr]; 
-    length = ExportByteArray[Length[data], "UnsignedInteger32"]; 
-    Join[length, data]
-]
+
 
 
 getLength[buffer_DataStructure] := 
@@ -377,12 +384,10 @@ JTPServerDrop[JTPServer[server_Symbol?AssociationQ], uuid_] := (
 )
 
 
-SetAttributes[JTPSend, HoldRest]
 
 
-JTPSend[uuid_, expr_] := (
-	BinaryWrite[SocketObject[uuid], serialize[Hold[expr]]]
-)
+
+
 
 
 JTPServer[server_Symbol?AssociationQ][keys__String] := 
