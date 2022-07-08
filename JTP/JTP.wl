@@ -192,7 +192,7 @@ If[True,
 	Block[{$message = StringTemplate[message][args]}, 
     	server["log"]["Push", $message]; 
      
-    	Return[$message]
+    	Print[$message]
 	],
 	"nohup"
 ]
