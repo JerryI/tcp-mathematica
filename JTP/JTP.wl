@@ -86,10 +86,8 @@ Block[{socket = uuid},
 ]
 
 serialize[expr_] := 
-Module[{data, length}, 
-    data = BinarySerialize[expr]; 
-    length = ExportByteArray[Length[data], "UnsignedInteger32"]; 
-    Join[length, data]
+With[{data = BinarySerialize[expr]}, 
+    Join[ExportByteArray[Length[data], "UnsignedInteger32"], data]
 ]
 
 JTPSend[uuid_, expr_] := (
