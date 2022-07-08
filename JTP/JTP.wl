@@ -6,7 +6,11 @@
 
 (* ::Section:: *)
 (*Begin package*)
-
+evaluate[uuid_String, expr_] := 
+(*virtual env*)
+Block[{jsocket = uuid},
+	ReleaseHold[expr]
+]
 
 BeginPackage["JTP`"]
 
@@ -79,11 +83,7 @@ JTPSend::usage =
 (* ::Section:: *)
 (*Begin private*)
 
-evaluate[uuid_String, expr_] := 
-(*virtual env*)
-Block[{jsocket = uuid},
-	ReleaseHold[expr]
-]
+
 
 serialize[expr_] := 
 With[{data = BinarySerialize[expr]}, 
@@ -297,7 +297,7 @@ Module[{set, get},
 			writeLog[server, "[<*Now*>] The length was matched"];
 			
 			logWrite["evaluate from UUID: "<>uuid];
-			server["promise"][uuid, evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
+			server["promise"][uuid, Global`evaluate[uuid, deserialize@@{get["data"], get["length"]}]]; 
 
 			If[get["data"]["EmptyQ"],
 				set["status", "Empty"]; 
