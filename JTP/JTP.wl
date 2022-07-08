@@ -90,7 +90,7 @@ With[{data = BinarySerialize[expr]},
     Join[ExportByteArray[Length[data], "UnsignedInteger32"], data]
 ]
 
-JTPSend[uuid_, expr_] := (
+JTPSend[uuid_String, expr_] := (
 	BinaryWrite[SocketObject[uuid], serialize[Hold[expr]]]
 )
 
@@ -188,7 +188,7 @@ Table[LinkLaunch["mathkernel -mathlink"], {n}]
 
 
 writeLog[server_Symbol?AssociationQ, message_String, args___] := 
-If[!server["nohup"],
+If[True,
 	Block[{$message = StringTemplate[message][args]}, 
     	server["log"]["Push", $message]; 
      
