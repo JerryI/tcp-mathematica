@@ -6,11 +6,7 @@
 
 (* ::Section:: *)
 (*Begin package*)
-evaluate[uuid_String, expr_] := 
-(*virtual env*)
-Block[{jsocket = uuid},
-	ReleaseHold[expr]
-]
+
 
 BeginPackage["JTP`"]
 
@@ -83,7 +79,11 @@ JTPSend::usage =
 (* ::Section:: *)
 (*Begin private*)
 
-
+evaluate[uuid_String, expr_] := 
+(*virtual env*)
+Block[{jsocket = uuid},
+	ReleaseHold[expr]
+]
 
 serialize[expr_] := 
 With[{data = BinarySerialize[expr]}, 
