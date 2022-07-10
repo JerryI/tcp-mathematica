@@ -10,10 +10,10 @@ Implementation of the simple protocol to transfer arbitrary data over TCP betwee
 * TCP packet size doesn't matter
 
 ## Installation
-It is performed simply via `PacletInstall`
+It is performed simply via `Import`
 
-    PacletInstall["https://github.com/JerryI/tcp-mathematica/blob/main/JTP.paclet?raw=true", ForceVersionInstall -> True]
-    <<JTP`
+    Import["https://raw.githubusercontent.com/JerryI/tcp-mathematica/main/\
+JTP/JTP.wl"];
 
 The examples are stored in `test.nb`.
 
@@ -47,6 +47,10 @@ The same as the previous, but doen't stop the program and accepts `callback[uuid
 
     JTPClientEvaluateAsync[client, expression, Promise -> callback]
 
+If you don't care about the result - use
+
+	JTPClientSend[cli, socket]	
+	
 ### 3. Listening mode
 To start contineous listerning mode on the client use
 
@@ -59,7 +63,7 @@ Other notes on everything...
 ### Local variables
 The evaluation of the incomming messages on the client and server either performes inside `Block[]` with defined variable `socket = uuid`, where `uuid` is id of the socket, which sent the message. It can be obtained by
 
-    JTPClientSend[cli, socket] == "0e5eac ... "
+    JTPClientEvaluate[cli, socket] == "0e5eac ... "
 
 And to reply to yourself using low-level functions on the server's side
 
@@ -68,7 +72,7 @@ And to reply to yourself using low-level functions on the server's side
 
 This part is still in development...
 
-### Send messages to the particular client from server
+### Send messages to the particular client from server (async)
 For this reason you need to obtain uuid of the socket first
 
     JTPSend[uuid, expr]
@@ -76,5 +80,3 @@ For this reason you need to obtain uuid of the socket first
 ### Multiple kernels
 This part is still in development...
 
-## Development
-You can create the new paclet using `build.nb`. 
