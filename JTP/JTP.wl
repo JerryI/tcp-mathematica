@@ -86,7 +86,7 @@ Block[{jsocket = uuid},
 ]
 
 serialize[expr_] := 
-With[{data = BinarySerialize[expr]}, 
+With[{data = BinarySerialize[expr//Compress]}, 
     Join[ExportByteArray[Length[data], "UnsignedInteger32"], data]
 ]
 
@@ -136,7 +136,7 @@ Module[{data = buffer["PopBack"]},
 		];	
 	];
 
-	BinaryDeserialize[data]
+	BinaryDeserialize[data]//Uncompress
 ]
 
 
