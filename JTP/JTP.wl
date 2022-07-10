@@ -439,7 +439,7 @@ Module[{raw, length},
 	length = getLength[Take[raw, 4]];
 	raw = Drop[raw, 4];
 	While[Length[raw] < length, raw = Join[raw, SocketReadMessage[server["socket"]]]];
-	raw // BinaryDeserialize // ReleaseHold
+	raw // BinaryDeserialize // Uncompress // ReleaseHold
 ]
 
 JTPClient /: 
