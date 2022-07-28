@@ -12,8 +12,7 @@ Implementation of the simple protocol to transfer arbitrary data over TCP betwee
 ## Installation
 It is performed simply via `Import`
 
-    Import["https://raw.githubusercontent.com/JerryI/tcp-mathematica/main/\
-JTP/JTP.wl"];
+    Import["https://raw.githubusercontent.com/JerryI/tcp-mathematica/main/JTP/JTP.wl"];
 
 The examples are stored in `test.nb`.
 
